@@ -1,4 +1,6 @@
-# basic-game-loop
+# browser-game
+
+A sandbox to let me play around with JS browser-based game development.
 
 ## Project Setup
 
