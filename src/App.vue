@@ -1,4 +1,6 @@
-<script setup></script>
+<script setup>
+import Game from './components/Game.vue';
+</script>
 
 <template>
 	<header>
@@ -6,7 +8,9 @@
 		<p class="lead">A sandbox.</p>
 	</header>
 
-	<main></main>
+	<main>
+		<Game/>
+	</main>
 </template>
 
 <style></style>
