@@ -1,0 +1,21 @@
+dist
+dist-ssr
+node_modules
+
+# Util
+_local
+*.local
+*.bak
+*~
+
+# Log files
+logs
+*.log
+npm-debug.log*
+
+# IDEs
+.nova
+.idea
+
+# System
+.DS_Store
