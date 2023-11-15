@@ -1,0 +1,17 @@
+/**
+ * Base List Styles
+ */
+
+
+.dl-cols {
+	display: grid;
+	grid-template-columns: max-content max-content;
+	gap: 0 var(--spacer-1);
+
+	dt {
+		grid-column: 1;
+	}
+	dd {
+		grid-column: 2;
+	}
+}
