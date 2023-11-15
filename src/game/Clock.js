@@ -42,8 +42,6 @@ export default class Clock {
 
 		this.options = Object.assign({}, this.constructor.DEFAULTS, options);
 
-		console.log(this.options);
-
 		[ 'onStart', 'onStarted', 'requestAnimationFrame' ].forEach(method => {
 			if (typeof this.options[method] !== 'function') {
 				throw new ClockOptionTypeError(`'options.${method}' must be a
