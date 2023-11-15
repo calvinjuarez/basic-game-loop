@@ -15,6 +15,9 @@ const displayPxSize = computed(() => (store.display
 ));
 const fps = ref('');
 
+const isDevHidden = ref(false);
+const isPaused = ref(false);
+
 
 function update(stepTime) {
 	if (! store.displayWidth || ! store.displayHeight) return;
@@ -33,6 +36,8 @@ function draw() {
 
 
 const clock = new Clock(stepTime => {
+	if (isPaused.value) return;
+
 	update(stepTime);
 	draw();
 }, {
@@ -56,7 +61,7 @@ onMounted(() => {
 			width="1600"
 			height="900"
 		></canvas>
-		<aside class="game-dev-info">
+		<aside class="game-dev-info" v-if="! isDevHidden">
 			<h5>Dev Info</h5>
 			<h6>Performance</h6>
 			<dl class="dl-cols">
@@ -71,12 +76,28 @@ onMounted(() => {
 				<dd><output>{{ displaySize }}</output></dd>
 			</dl>
 		</aside>
+		<aside class="game-dev-tools">
+			<h5>Dev Tools</h5>
+			<div class="game-dev-tools-bar">
+				<button
+					type="button"
+					class="btn btn-outline-secondary"
+					@click="isPaused = ! isPaused"
+				>&#9199;</button>
+				<button
+					type="button"
+					class="btn btn-outline-secondary"
+					@click="isDevHidden = ! isDevHidden"
+				>Toggle Dev Info</button>
+			</div>
+		</aside>
 	</div>
 </template>
 
 <style>
 .game {
 	display: flex;
+	flex-wrap: wrap;
 	gap: var(--spacer-2);
 }
 .game-display {
@@ -85,4 +106,11 @@ onMounted(() => {
 	max-width: 400px;
 }
 .game-dev-info {}
+.game-dev-tools {
+	width: 100%;
+}
+	.game-dev-tools-bar {
+		display: flex;
+		gap: 0 var(--spacer-1);
+	}
 </style>
