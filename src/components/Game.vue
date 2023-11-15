@@ -2,18 +2,50 @@
 import { ref, computed, onMounted } from 'vue';
 
 import Clock from '@/game/Clock.js';
+import store from '@/data/store.js';
 
 
-let fps = ref('');
+const displaySize = computed(() => (store.display
+	? `${store.display.canvas.offsetWidth}x${store.display.canvas.offsetHeight}`
+	: 'none'
+));
+const displayPxSize = computed(() => (store.display
+	? `${store.displayWidth}x${store.displayHeight}`
+	: 'none'
+));
+const fps = ref('');
 
-const clock = new Clock(() => {}, {
+
+function update(stepTime) {
+	if (! store.displayWidth || ! store.displayHeight) return;
+
+	const throttle = .1;
+
+	store.x = (store.x + (stepTime * throttle)) % store.displayWidth;
+	store.y = (store.y + (stepTime * throttle)) % store.displayHeight;
+}
+function draw() {
+	if (! store.display) return;
+
+	store.display.clearRect(0, 0, store.displayWidth, store.displayHeight);
+	store.display.fillRect(store.x - 16, store.y - 16, 32, 32);
+}
+
+
+const clock = new Clock(stepTime => {
+	update(stepTime);
+	draw();
+}, {
 	doMeasureFPS: true,
 	onFPSChange(_fps) { fps.value = `~${_fps}fps`; },
 });
 
 clock.start();
 
-window.clock = clock;
+
+onMounted(() => {
+	store.setDisplay(document.getElementById('game-display'));
+});
 </script>
 
 <template>
@@ -26,9 +58,17 @@ window.clock = clock;
 		></canvas>
 		<aside class="game-dev-info">
 			<h5>Dev Info</h5>
+			<h6>Performance</h6>
 			<dl class="dl-cols">
 				<dt>fps:</dt>
 				<dd><output>{{ fps }}</output></dd>
+			</dl>
+			<h6>Display</h6>
+			<dl class="dl-cols">
+				<dt>pixel dimensions:</dt>
+				<dd><output>{{ displayPxSize }}</output></dd>
+				<dt>dimensions on screen:</dt>
+				<dd><output>{{ displaySize }}</output></dd>
 			</dl>
 		</aside>
 	</div>
