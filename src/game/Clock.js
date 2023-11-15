@@ -36,9 +36,8 @@ export class ClockRequestAnimationFrameUnavailableError extends Error {}
  */
 export default class Clock {
 	constructor(onTick, options) {
-		if (typeof onTick !== 'function') {
+		if (typeof onTick !== 'function')
 			throw new ClockArgumentTypeError(`'onTick' must be a function`);
-		}
 
 		this.onTick = onTick;
 
@@ -49,10 +48,9 @@ export default class Clock {
 			'onStarted',
 			'requestAnimationFrame'
 		].forEach(method => {
-			if (typeof this.options[method] !== 'function') {
+			if (typeof this.options[method] !== 'function')
 				throw new ClockOptionTypeError(`'options.${method}' must be a
 					function`);
-			}
 
 			this[method] = this.options[method];
 		});
@@ -96,24 +94,31 @@ export default class Clock {
 
 
 	#onFPSChange() {
-		(typeof this.onFPSChange === 'function') && this.onFPSChange(...arguments);
+		if (typeof this.onFPSChange === 'function')
+			this.onFPSChange(...arguments);
 	}
 	#onStart() {
-		(this.#doMeasureFPS) && this.#startMeasuringFPS();
-		(typeof this.onStart === 'function') && this.onStart(...arguments);
+		if (this.#doMeasureFPS)
+			this.#startMeasuringFPS();
+		if (typeof this.onStart === 'function')
+			this.onStart(...arguments);
 	}
 	#onStarted() {
-		(typeof this.onStarted === 'function') && this.onStarted(...arguments);
+		if (typeof this.onStarted === 'function')
+			this.onStarted(...arguments);
 	}
 	#onTick() {
-		(this.#doMeasureFPS) && (++this.#framesThisSecond);
-		(typeof this.onTick === 'function') && this.onTick(...arguments);
+		if (this.#doMeasureFPS)
+			++this.#framesThisSecond;
+		if (typeof this.onTick === 'function')
+			this.onTick(...arguments);
 	}
 
 	#setFPS(fps) {
 		const didChange = fps !== this._FPS;
 
-		(didChange) && this.#onFPSChange(this._FPS = fps);
+		if (didChange)
+			this.#onFPSChange(this._FPS = fps);
 	}
 
 	#startMeasuringFPS() {
@@ -170,12 +175,10 @@ export default class Clock {
 			? enable
 			: ! this.#doMeasureFPS;
 
-		if (state === true && ! this.#doMeasureFPS) {
+		if (state === true && ! this.#doMeasureFPS)
 			this.#startMeasuringFPS();
-		}
-		else if (state === false && this.#doMeasureFPS) {
+		else if (state === false && this.#doMeasureFPS)
 			this.#stopMeasuringFPS();
-		}
 
 		this.#doMeasureFPS = state;
 
