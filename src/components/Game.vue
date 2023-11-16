@@ -5,6 +5,8 @@ import Clock from '@/game/Clock.js';
 import store from '@/data/store.js';
 
 
+const modulo = (n, d) => ((n % d) + d) % d; // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder#description
+
 const displaySize = computed(() => (store.display
 	? `${store.display.canvas.offsetWidth}x${store.display.canvas.offsetHeight}`
 	: 'none'
@@ -18,13 +20,11 @@ const fps = ref('');
 const isDevHidden = ref(false);
 const isPaused = ref(false);
 
+let isWindowFocussed = true;
 
-const modulo = (n, d) => ((n % d) + d) % d; // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder#description
 
-
-function toggleEdgeBehavior() {
-	store.edgeBehavior = (store.edgeBehavior === 'bounce') ? 'loop' : 'bounce';
-}
+window.addEventListener('blur', () => isWindowFocussed = false);
+window.addEventListener('focus', () => isWindowFocussed = true);
 
 
 function update(stepTime) {
@@ -55,7 +55,7 @@ function draw() {
 
 
 const clock = new Clock(stepTime => {
-	if (isPaused.value) return;
+	if (isPaused.value || ! isWindowFocussed) return;
 
 	update(stepTime);
 	draw();
@@ -67,10 +67,17 @@ const clock = new Clock(stepTime => {
 clock.start();
 
 
+function toggleEdgeBehavior() {
+	store.edgeBehavior = (store.edgeBehavior === 'bounce') ? 'loop' : 'bounce';
+}
+
+
 onMounted(() => {
 	store.setDisplay(document.getElementById('game-display'));
 });
 </script>
+
+
 
 <template>
 	<div class="game">
@@ -124,6 +131,8 @@ onMounted(() => {
 		</aside>
 	</div>
 </template>
+
+
 
 <style>
 .game {
