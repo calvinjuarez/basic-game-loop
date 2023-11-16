@@ -19,13 +19,32 @@ const isDevHidden = ref(false);
 const isPaused = ref(false);
 
 
+const modulo = (n, d) => ((n % d) + d) % d; // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder#description
+
+
+function toggleEdgeBehavior() {
+	store.edgeBehavior = (store.edgeBehavior === 'bounce') ? 'loop' : 'bounce';
+}
+
+
 function update(stepTime) {
 	if (! store.displayWidth || ! store.displayHeight) return;
 
-	const throttle = .1;
+	const throttle = .2;
 
-	store.x = (store.x + (stepTime * throttle)) % store.displayWidth;
-	store.y = (store.y + (stepTime * throttle)) % store.displayHeight;
+	const newX = stepTime * throttle * (store.negX ? -1 : 1) + store.x;
+	const newY = stepTime * throttle * (store.negY ? -1 : 1) + store.y;
+
+	switch (store.edgeBehavior) {
+		case 'bounce': {
+			store.setX(newX);
+			store.setY(newY);
+			break; }
+		case 'loop': {
+			store.setX(modulo(newX, store.displayWidth));
+			store.setY(modulo(newY, store.displayHeight));
+			break; }
+	}
 }
 function draw() {
 	if (! store.display) return;
@@ -75,6 +94,13 @@ onMounted(() => {
 				<dt>dimensions on screen:</dt>
 				<dd><output>{{ displaySize }}</output></dd>
 			</dl>
+			<h6>Game</h6>
+			<dl class="dl-cols">
+				<dt>(x,y):</dt>
+				<dd><output>{{ `(${Math.round(store.x)},${Math.round(store.y)})` }}</output></dd>
+				<dt>edge behavior:</dt>
+				<dd><output>{{ store.edgeBehavior }}</output></dd>
+			</dl>
 		</aside>
 		<aside class="game-dev-tools">
 			<h5>Dev Tools</h5>
@@ -84,6 +110,11 @@ onMounted(() => {
 					class="btn btn-outline-secondary"
 					@click="isPaused = ! isPaused"
 				>&#9199;</button>
+				<button
+					type="button"
+					class="btn btn-outline-secondary"
+					@click="toggleEdgeBehavior"
+				>Toggle Edge Behavior</button>
 				<button
 					type="button"
 					class="btn btn-outline-secondary"
@@ -98,6 +129,7 @@ onMounted(() => {
 .game {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: start;
 	gap: var(--spacer-2);
 }
 .game-display {
