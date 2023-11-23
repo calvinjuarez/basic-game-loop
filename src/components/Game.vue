@@ -4,6 +4,8 @@ import { clamp } from '@/util/number.js';
 
 import Clock from '@/game/Clock.js';
 
+import GameControls from '@/components/GameControls.vue';
+
 
 const store = inject('store');
 
@@ -68,6 +70,22 @@ onMounted(() => {
 			width="1600"
 			height="900"
 		></canvas>
+		<GameControls/>
+		<aside class="game-dev-tools">
+			<h5>Dev Tools</h5>
+			<div class="game-dev-tools-bar">
+				<button
+					type="button"
+					class="btn btn-outline-secondary"
+					@click="isPaused = ! isPaused"
+				>&#9199;</button>
+				<button
+					type="button"
+					class="btn btn-outline-secondary"
+					@click="isDevHidden = ! isDevHidden"
+				>Toggle Dev Info</button>
+			</div>
+		</aside>
 		<aside class="game-dev-info" v-if="! isDevHidden">
 			<h5>Dev Info</h5>
 			<h6>Performance</h6>
@@ -87,21 +105,6 @@ onMounted(() => {
 				<dt>(x,y):</dt>
 				<dd><output>{{ `(${Math.round(store.x)},${Math.round(store.y)})` }}</output></dd>
 			</dl>
-		</aside>
-		<aside class="game-dev-tools">
-			<h5>Dev Tools</h5>
-			<div class="game-dev-tools-bar">
-				<button
-					type="button"
-					class="btn btn-outline-secondary"
-					@click="isPaused = ! isPaused"
-				>&#9199;</button>
-				<button
-					type="button"
-					class="btn btn-outline-secondary"
-					@click="isDevHidden = ! isDevHidden"
-				>Toggle Dev Info</button>
-			</div>
 		</aside>
 	</div>
 </template>
