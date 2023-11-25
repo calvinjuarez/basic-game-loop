@@ -63,11 +63,12 @@ function controlEnd(e) {
 			@pointermove.stop="controlMove($event)"
 			@pointerup.stop="controlEnd($event)"
 		>
-			<circle
+			<rect
 				class="joystick-boundary"
-				cx="0"
-				cy="0"
-				r="100"
+				height="200"
+				width="200"
+				x="-100"
+				y="-100"
 			/>
 			<circle
 				class="joystick-handle"
