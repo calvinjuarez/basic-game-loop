@@ -1,11 +1,9 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 
-import Clock from '@/game/Clock.js';
 import store from '@/data/store.js';
+import Clock from '@/game/Clock.js';
 
-
-const modulo = (n, d) => ((n % d) + d) % d; // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder#description
 
 const displaySize = computed(() => (store.display
 	? `${store.display.canvas.offsetWidth}x${store.display.canvas.offsetHeight}`
@@ -31,20 +29,6 @@ function update(stepTime) {
 	if (! store.displayWidth || ! store.displayHeight) return;
 
 	const throttle = .2;
-
-	const newX = stepTime * throttle * (store.negX ? -1 : 1) + store.x;
-	const newY = stepTime * throttle * (store.negY ? -1 : 1) + store.y;
-
-	switch (store.edgeBehavior) {
-		case 'bounce': {
-			store.setX(newX);
-			store.setY(newY);
-			break; }
-		case 'loop': {
-			store.setX(modulo(newX, store.displayWidth));
-			store.setY(modulo(newY, store.displayHeight));
-			break; }
-	}
 }
 function draw() {
 	if (! store.display) return;
@@ -65,11 +49,6 @@ const clock = new Clock(stepTime => {
 });
 
 clock.start();
-
-
-function toggleEdgeBehavior() {
-	store.edgeBehavior = (store.edgeBehavior === 'bounce') ? 'loop' : 'bounce';
-}
 
 
 onMounted(() => {
@@ -105,8 +84,6 @@ onMounted(() => {
 			<dl class="dl-cols">
 				<dt>(x,y):</dt>
 				<dd><output>{{ `(${Math.round(store.x)},${Math.round(store.y)})` }}</output></dd>
-				<dt>edge behavior:</dt>
-				<dd><output>{{ store.edgeBehavior }}</output></dd>
 			</dl>
 		</aside>
 		<aside class="game-dev-tools">
@@ -117,11 +94,6 @@ onMounted(() => {
 					class="btn btn-outline-secondary"
 					@click="isPaused = ! isPaused"
 				>&#9199;</button>
-				<button
-					type="button"
-					class="btn btn-outline-secondary"
-					@click="toggleEdgeBehavior"
-				>Toggle Edge Behavior</button>
 				<button
 					type="button"
 					class="btn btn-outline-secondary"
