@@ -32,7 +32,11 @@ window.addEventListener('focus', () => isWindowFocussed = true);
 function update(stepTime) {
 	if (! store.displayWidth || ! store.displayHeight) return;
 
-	const throttle = .2;
+	const newX = stepTime * store.sensitivity * store.throttleX + store.x;
+	const newY = stepTime * store.sensitivity * store.throttleY + store.y;
+
+	store.x = clamp(newX, 0, store.displayWidth);
+	store.y = clamp(newY, 0, store.displayHeight);
 }
 function draw() {
 	if (! store.display) return;
@@ -57,6 +61,11 @@ clock.start();
 
 onMounted(() => {
 	store.setDisplay(document.getElementById('game-display'));
+
+	store.x = store.displayWidth / 2;
+	store.y = store.displayHeight / 2;
+
+	draw();
 });
 </script>
 
