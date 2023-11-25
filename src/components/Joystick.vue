@@ -1,17 +1,18 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { inject, reactive, ref } from 'vue';
 
 import { clamp } from '@/util/number.js';
 
+
+const store = inject('store');
+
+const $handle = ref(null);
 
 const controlling = ref(false);
 const position = reactive({
 	x: 0,
 	y: 0,
 });
-
-
-const $handle = ref(null);
 
 let pointerX = 0;
 let pointerY = 0;
@@ -31,6 +32,9 @@ function controlMove(e) {
 	position.x = clamp(e.x - pointerX, -100, 100);
 	position.y = clamp(e.y - pointerY, -100, 100);
 
+	store.throttleX = position.x / 100;
+	store.throttleY = position.y / 100;
+
 	// #sanitycheck: end control if we lose pointer capture (which somehow
 	// happens sometimes, though I'm not sure why.
 	if (! $handle.value.hasPointerCapture(e.pointerId))
@@ -39,8 +43,8 @@ function controlMove(e) {
 function controlEnd(e) {
 	controlling.value = false;
 
-	position.x = pointerX = 0;
-	position.y = pointerY = 0;
+	store.throttleX = position.x = pointerX = 0;
+	store.throttleY = position.y = pointerY = 0;
 
 	if (e && $handle.value.hasPointerCapture(e.pointerId))
 		$handle.value.releasePointerCapture(e.pointerId);

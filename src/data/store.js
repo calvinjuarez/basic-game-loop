@@ -7,6 +7,8 @@ export default reactive({
 	display: null,
 	displayHeight: 0,
 	displayWidth: 0,
+	throttleX: 0,
+	throttleY: 0,
 	x: 0,
 	y: 0,
 
