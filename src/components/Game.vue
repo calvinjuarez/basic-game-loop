@@ -1,9 +1,11 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, inject, onMounted } from 'vue';
+import { clamp } from '@/util/number.js';
 
-import store from '@/data/store.js';
 import Clock from '@/game/Clock.js';
 
+
+const store = inject('store');
 
 const displaySize = computed(() => (store.display
 	? `${store.display.canvas.offsetWidth}x${store.display.canvas.offsetHeight}`

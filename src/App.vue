@@ -1,5 +1,12 @@
 <script setup>
-import Game from './components/Game.vue';
+import { provide } from 'vue';
+
+import store from '@/data/store';
+
+import Game from '@/components/Game.vue';
+
+
+provide('store', store);
 </script>
 
 <template>
