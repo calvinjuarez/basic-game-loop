@@ -30,6 +30,11 @@ function controlMove(e) {
 
 	position.x = clamp(e.x - pointerX, -100, 100);
 	position.y = clamp(e.y - pointerY, -100, 100);
+
+	// #sanitycheck: end control if we lose pointer capture (which somehow
+	// happens sometimes, though I'm not sure why.
+	if (! $handle.value.hasPointerCapture(e.pointerId))
+		controlEnd();
 }
 function controlEnd(e) {
 	controlling.value = false;
@@ -37,7 +42,8 @@ function controlEnd(e) {
 	position.x = pointerX = 0;
 	position.y = pointerY = 0;
 
-	$handle.value.releasePointerCapture(e.pointerId);
+	if (e && $handle.value.hasPointerCapture(e.pointerId))
+		$handle.value.releasePointerCapture(e.pointerId);
 }
 </script>
 
