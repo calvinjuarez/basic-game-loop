@@ -1,6 +1,8 @@
 <script setup>
 import { reactive, ref } from 'vue';
 
+import { clamp } from '@/util/number.js';
+
 
 const controlling = ref(false);
 const position = reactive({
@@ -26,8 +28,8 @@ function controlStart(e) {
 function controlMove(e) {
 	if (! controlling.value) return;
 
-	position.x = Math.max(Math.min(e.x - pointerX, 100), -100);
-	position.y = Math.max(Math.min(e.y - pointerY, 100), -100);
+	position.x = clamp(e.x - pointerX, -100, 100);
+	position.y = clamp(e.y - pointerY, -100, 100);
 }
 function controlEnd(e) {
 	controlling.value = false;
