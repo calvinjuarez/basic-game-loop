@@ -94,6 +94,9 @@ function controlEnd(e) {
 
 
 <style>
+.joystick-visual {
+	opacity: .5;
+}
 .joystick-boundary {
 	fill: var(--bs-gray-300);
 }

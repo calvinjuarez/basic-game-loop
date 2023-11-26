@@ -3,7 +3,8 @@ import { reactive } from 'vue'
 
 export class StoreTypeError extends TypeError {}
 
-export default reactive({
+const store = reactive({
+	color: 'black',
 	display: null,
 	displayHeight: 0,
 	displayWidth: 0,
@@ -21,5 +22,10 @@ export default reactive({
 		this.display = canvas.getContext('2d');
 		this.displayWidth = canvas.width;
 		this.displayHeight = canvas.height;
+
+		this.display.fillStyle = this.color;
 	},
 });
+
+
+export default store;
