@@ -1,10 +1,10 @@
-import { reactive } from 'vue'
+import { reactive, watch } from 'vue'
 
 
 export class StoreTypeError extends TypeError {}
 
 const store = reactive({
-	color: 'black',
+	color: window.localStorage.getItem('color'),
 	display: null,
 	displayHeight: 0,
 	displayWidth: 0,
@@ -26,6 +26,9 @@ const store = reactive({
 		this.display.fillStyle = this.color;
 	},
 });
+
+
+watch(() => store.color, color => window.localStorage.setItem('color', color));
 
 
 export default store;
