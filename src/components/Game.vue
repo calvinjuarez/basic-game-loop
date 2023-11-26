@@ -35,12 +35,13 @@ function update(stepTime) {
 	const newX = stepTime * store.sensitivity * store.throttleX + store.x;
 	const newY = stepTime * store.sensitivity * store.throttleY + store.y;
 
-	store.x = clamp(newX, 0, store.displayWidth);
-	store.y = clamp(newY, 0, store.displayHeight);
+	store.x = clamp(newX, 16, store.displayWidth - 16);
+	store.y = clamp(newY, 16, store.displayHeight - 16);
 }
 function draw() {
 	if (! store.display) return;
 
+	store.display.fillStyle = store.color;
 	store.display.clearRect(0, 0, store.displayWidth, store.displayHeight);
 	store.display.fillRect(store.x - 16, store.y - 16, 32, 32);
 }
