@@ -1,5 +1,5 @@
 <script setup>
-import { inject, reactive, ref } from 'vue';
+import { computed, inject, reactive, ref } from 'vue';
 
 import { clamp } from '@/util/number.js';
 
@@ -9,13 +9,15 @@ const store = inject('store');
 const $handle = ref(null);
 
 const controlling = ref(false);
-const position = reactive({
-	x: 0,
-	y: 0,
-});
 
 let pointerX = 0;
 let pointerY = 0;
+
+
+const position = computed(() => ({
+	x: store.throttleX * 100,
+	y: store.throttleY * 100,
+}));
 
 
 function controlStart(e) {
@@ -29,11 +31,8 @@ function controlStart(e) {
 function controlMove(e) {
 	if (! controlling.value) return;
 
-	position.x = clamp(e.x - pointerX, -100, 100);
-	position.y = clamp(e.y - pointerY, -100, 100);
-
-	store.throttleX = position.x / 100;
-	store.throttleY = position.y / 100;
+	store.throttleX = clamp(e.x - pointerX, -100, 100) / 100;
+	store.throttleY = clamp(e.y - pointerY, -100, 100) / 100;
 
 	// #sanitycheck: end control if we lose pointer capture (which somehow
 	// happens sometimes, though I'm not sure why.
@@ -43,8 +42,8 @@ function controlMove(e) {
 function controlEnd(e) {
 	controlling.value = false;
 
-	store.throttleX = position.x = pointerX = 0;
-	store.throttleY = position.y = pointerY = 0;
+	store.throttleX = pointerX = 0;
+	store.throttleY = pointerY = 0;
 
 	if (e && $handle.value.hasPointerCapture(e.pointerId))
 		$handle.value.releasePointerCapture(e.pointerId);
@@ -94,16 +93,13 @@ function controlEnd(e) {
 
 
 <style>
-.joystick-visual {
-	opacity: .5;
-}
+.joystick-visual {}
 .joystick-boundary {
 	fill: var(--bs-gray-300);
+	opacity: .5;
 }
 .joystick-handle {
 	fill: var(--bs-gray-600);
-}
-.joystick-handle::active {
-	fill: var(--bs-gray-900);
+	opacity: .5;
 }
 </style>
