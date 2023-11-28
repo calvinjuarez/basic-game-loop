@@ -11,7 +11,7 @@ provide('store', store);
 
 <template>
 	<header>
-		<h1 class="display-1">Browser Game</h1>
+		<h1 class="display-1">{{ store.title.trim() }}</h1>
 		<p class="lead">A sandbox.</p>
 	</header>
 
@@ -20,4 +20,8 @@ provide('store', store);
 	</main>
 </template>
 
-<style></style>
+<style>
+h1:empty::before {
+	content: '\0000A0';
+}
+</style>

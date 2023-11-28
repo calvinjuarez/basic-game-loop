@@ -11,6 +11,7 @@ const store = reactive({
 	sensitivity: 1,
 	throttleX: 0,
 	throttleY: 0,
+	title: 'Browser Game',
 	x: 0,
 	y: 0,
 
