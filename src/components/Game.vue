@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, inject, onMounted } from 'vue';
+import { ref, computed, inject, onMounted, watchEffect } from 'vue';
 import { clamp } from '@/util/number.js';
 
 import Clock from '@/game/Clock.js';
@@ -43,7 +43,19 @@ function draw() {
 
 	store.display.fillStyle = store.color;
 	store.display.clearRect(0, 0, store.displayWidth, store.displayHeight);
-	store.display.fillRect(store.x - 16, store.y - 16, 32, 32);
+	store.display.fillRect(store.x - 16, store.y - 16, 32, 32); // avatar
+
+	if (isPaused.value) {
+		const barWidth = 50;
+		const barHeight = 150;
+		const x = (store.displayWidth - barWidth) / 2;
+		const y = (store.displayHeight - barHeight) / 2;
+
+		store.display.fillStyle = '#00000033';
+		store.display.fillRect(0, 0, store.displayWidth, store.displayHeight);
+		store.display.fillRect(x - barWidth, y, barWidth, barHeight);
+		store.display.fillRect(x + barWidth, y, barWidth, barHeight);
+	}
 }
 
 
@@ -68,6 +80,10 @@ onMounted(() => {
 
 	draw();
 });
+
+// pausing blocks updates from the clock, so to note that we've paused, we call
+// draw() one more time when the `isPaused` value changes to `true`.
+watchEffect(() => isPaused.value && draw());
 </script>
 
 
@@ -112,8 +128,10 @@ onMounted(() => {
 			</dl>
 			<h6>Game</h6>
 			<dl class="dl-cols">
-				<dt>(x,y):</dt>
-				<dd><output>{{ `(${Math.round(store.x)},${Math.round(store.y)})` }}</output></dd>
+				<dt>(x, y):</dt>
+				<dd><output>{{ `(${Math.round(store.x)}, ${Math.round(store.y)})` }}</output></dd>
+				<dt>color:</dt>
+				<dd><output>{{ store.color }}</output></dd>
 			</dl>
 		</aside>
 	</div>
