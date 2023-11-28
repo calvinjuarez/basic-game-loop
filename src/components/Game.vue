@@ -9,6 +9,9 @@ import GameControls from '@/components/GameControls.vue';
 
 const store = inject('store');
 
+const inputs = computed(() => JSON.stringify(
+	Object.keys(store.inputs).filter(key => store.inputs[key]), null, 1,
+).replace(/["\n]/g, '').replace(/\]/, ' ]'));
 const displaySize = computed(() => (store.display
 	? `${store.display.canvas.offsetWidth}x${store.display.canvas.offsetHeight}`
 	: 'none'
@@ -125,13 +128,15 @@ watchEffect(() => isPaused.value && draw());
 				<dd><output>{{ displayPxSize }}</output></dd>
 				<dt>dimensions on screen:</dt>
 				<dd><output>{{ displaySize }}</output></dd>
+				<dt>avatar color:</dt>
+				<dd><output>{{ store.color }}</output></dd>
 			</dl>
 			<h6>Game</h6>
 			<dl class="dl-cols">
 				<dt>(x, y):</dt>
 				<dd><output>{{ `(${Math.round(store.x)}, ${Math.round(store.y)})` }}</output></dd>
-				<dt>color:</dt>
-				<dd><output>{{ store.color }}</output></dd>
+				<dt>inputs:</dt>
+				<dd><output>{{ inputs }}</output></dd>
 			</dl>
 		</aside>
 	</div>

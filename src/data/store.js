@@ -1,4 +1,4 @@
-import { reactive, watch } from 'vue'
+import { reactive, watchEffect } from 'vue'
 
 
 export class StoreTypeError extends TypeError {}
@@ -8,6 +8,16 @@ const store = reactive({
 	display: null,
 	displayHeight: 0,
 	displayWidth: 0,
+	inputs: {
+		w: false,
+		a: false,
+		s: false,
+		d: false,
+		R: false,
+		L: false,
+		U: false,
+		D: false,
+	},
 	sensitivity: 1,
 	throttleX: 0,
 	throttleY: 0,
@@ -29,7 +39,17 @@ const store = reactive({
 });
 
 
-watch(() => store.color, color => window.localStorage.setItem('color', color));
+watchEffect(() => window.localStorage.setItem('color', store.color));
+watchEffect(() => {
+	const { d, a, R, L } = store.inputs;
+
+	store.throttleX = (.9 * (d || R)) + (-.9 * (a || L));
+});
+watchEffect(() => {
+	const { w, s, U, D } = store.inputs;
+
+	store.throttleY = (.9 * (s || D)) + (-.9 * (w || U));
+});
 
 
 export default store;
