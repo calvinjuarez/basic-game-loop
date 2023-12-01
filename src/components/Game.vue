@@ -1,12 +1,17 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, inject, onMounted, watchEffect } from 'vue';
+import { clamp } from '@/util/number.js';
 
 import Clock from '@/game/Clock.js';
-import store from '@/data/store.js';
+
+import GameControls from '@/components/GameControls.vue';
 
 
-const modulo = (n, d) => ((n % d) + d) % d; // see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder#description
+const store = inject('store');
 
+const inputs = computed(() => JSON.stringify(
+	Object.keys(store.inputs).filter(key => store.inputs[key]), null, 1,
+).replace(/["\n]/g, '').replace(/\]/, ' ]'));
 const displaySize = computed(() => (store.display
 	? `${store.display.canvas.offsetWidth}x${store.display.canvas.offsetHeight}`
 	: 'none'
@@ -30,27 +35,30 @@ window.addEventListener('focus', () => isWindowFocussed = true);
 function update(stepTime) {
 	if (! store.displayWidth || ! store.displayHeight) return;
 
-	const throttle = .2;
+	const newX = stepTime * store.sensitivity * store.throttleX + store.x;
+	const newY = stepTime * store.sensitivity * store.throttleY + store.y;
 
-	const newX = stepTime * throttle * (store.negX ? -1 : 1) + store.x;
-	const newY = stepTime * throttle * (store.negY ? -1 : 1) + store.y;
-
-	switch (store.edgeBehavior) {
-		case 'bounce': {
-			store.setX(newX);
-			store.setY(newY);
-			break; }
-		case 'loop': {
-			store.setX(modulo(newX, store.displayWidth));
-			store.setY(modulo(newY, store.displayHeight));
-			break; }
-	}
+	store.x = clamp(newX, 16, store.displayWidth - 16);
+	store.y = clamp(newY, 16, store.displayHeight - 16);
 }
 function draw() {
 	if (! store.display) return;
 
+	store.display.fillStyle = store.color;
 	store.display.clearRect(0, 0, store.displayWidth, store.displayHeight);
-	store.display.fillRect(store.x - 16, store.y - 16, 32, 32);
+	store.display.fillRect(store.x - 16, store.y - 16, 32, 32); // avatar
+
+	if (isPaused.value) {
+		const barWidth = 50;
+		const barHeight = 150;
+		const x = (store.displayWidth - barWidth) / 2;
+		const y = (store.displayHeight - barHeight) / 2;
+
+		store.display.fillStyle = '#00000033';
+		store.display.fillRect(0, 0, store.displayWidth, store.displayHeight);
+		store.display.fillRect(x - barWidth, y, barWidth, barHeight);
+		store.display.fillRect(x + barWidth, y, barWidth, barHeight);
+	}
 }
 
 
@@ -67,14 +75,18 @@ const clock = new Clock(stepTime => {
 clock.start();
 
 
-function toggleEdgeBehavior() {
-	store.edgeBehavior = (store.edgeBehavior === 'bounce') ? 'loop' : 'bounce';
-}
-
-
 onMounted(() => {
 	store.setDisplay(document.getElementById('game-display'));
+
+	store.x = store.displayWidth / 2;
+	store.y = store.displayHeight / 2;
+
+	draw();
 });
+
+// pausing blocks updates from the clock, so to note that we've paused, we call
+// draw() one more time when the `isPaused` value changes to `true`.
+watchEffect(() => isPaused.value && draw());
 </script>
 
 
@@ -87,6 +99,22 @@ onMounted(() => {
 			width="1600"
 			height="900"
 		></canvas>
+		<GameControls/>
+		<aside class="game-dev-tools">
+			<h5>Dev Tools</h5>
+			<div class="game-dev-tools-bar">
+				<button
+					type="button"
+					class="btn btn-outline-secondary"
+					@click="isPaused = ! isPaused"
+				>&#9199;</button>
+				<button
+					type="button"
+					class="btn btn-outline-secondary"
+					@click="isDevHidden = ! isDevHidden"
+				>Toggle Dev Info</button>
+			</div>
+		</aside>
 		<aside class="game-dev-info" v-if="! isDevHidden">
 			<h5>Dev Info</h5>
 			<h6>Performance</h6>
@@ -100,34 +128,16 @@ onMounted(() => {
 				<dd><output>{{ displayPxSize }}</output></dd>
 				<dt>dimensions on screen:</dt>
 				<dd><output>{{ displaySize }}</output></dd>
+				<dt>avatar color:</dt>
+				<dd><output>{{ store.color }}</output></dd>
 			</dl>
 			<h6>Game</h6>
 			<dl class="dl-cols">
-				<dt>(x,y):</dt>
-				<dd><output>{{ `(${Math.round(store.x)},${Math.round(store.y)})` }}</output></dd>
-				<dt>edge behavior:</dt>
-				<dd><output>{{ store.edgeBehavior }}</output></dd>
+				<dt>(x, y):</dt>
+				<dd><output>{{ `(${Math.round(store.x)}, ${Math.round(store.y)})` }}</output></dd>
+				<dt>inputs:</dt>
+				<dd><output>{{ inputs }}</output></dd>
 			</dl>
-		</aside>
-		<aside class="game-dev-tools">
-			<h5>Dev Tools</h5>
-			<div class="game-dev-tools-bar">
-				<button
-					type="button"
-					class="btn btn-outline-secondary"
-					@click="isPaused = ! isPaused"
-				>&#9199;</button>
-				<button
-					type="button"
-					class="btn btn-outline-secondary"
-					@click="toggleEdgeBehavior"
-				>Toggle Edge Behavior</button>
-				<button
-					type="button"
-					class="btn btn-outline-secondary"
-					@click="isDevHidden = ! isDevHidden"
-				>Toggle Dev Info</button>
-			</div>
 		</aside>
 	</div>
 </template>

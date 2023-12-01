@@ -1,15 +1,27 @@
-import { reactive } from 'vue'
+import { reactive, watchEffect } from 'vue'
 
 
 export class StoreTypeError extends TypeError {}
 
-export default reactive({
+const store = reactive({
+	color: window.localStorage.getItem('color'),
 	display: null,
 	displayHeight: 0,
 	displayWidth: 0,
-	edgeBehavior: 'bounce', // or 'loop' for pac-man/asteroids-like behavior
-	negX: false,
-	negY: false,
+	inputs: {
+		w: false,
+		a: false,
+		s: false,
+		d: false,
+		R: false,
+		L: false,
+		U: false,
+		D: false,
+	},
+	sensitivity: 1,
+	throttleX: 0,
+	throttleY: 0,
+	title: 'Browser Game',
 	x: 0,
 	y: 0,
 
@@ -21,21 +33,23 @@ export default reactive({
 		this.display = canvas.getContext('2d');
 		this.displayWidth = canvas.width;
 		this.displayHeight = canvas.height;
-	},
-	setX(x) {
-		this.x = x;
 
-		if (this.edgeBehavior === 'bounce') {
-			if (x >= (this.displayWidth - 16)) this.negX = true;
-			else if (x <= 16) this.negX = false;
-		}
-	},
-	setY(y) {
-		this.y = y;
-
-		if (this.edgeBehavior === 'bounce') {
-			if (y >= (this.displayHeight - 16)) this.negY = true;
-			else if (y <= 16) this.negY = false;
-		}
+		this.display.fillStyle = this.color;
 	},
 });
+
+
+watchEffect(() => window.localStorage.setItem('color', store.color));
+watchEffect(() => {
+	const { d, a, R, L } = store.inputs;
+
+	store.throttleX = (.9 * (d || R)) + (-.9 * (a || L));
+});
+watchEffect(() => {
+	const { w, s, U, D } = store.inputs;
+
+	store.throttleY = (.9 * (s || D)) + (-.9 * (w || U));
+});
+
+
+export default store;

@@ -1,0 +1,105 @@
+<script setup>
+import { computed, inject, reactive, ref } from 'vue';
+
+import { clamp } from '@/util/number.js';
+
+
+const store = inject('store');
+
+const $handle = ref(null);
+
+const controlling = ref(false);
+
+let pointerX = 0;
+let pointerY = 0;
+
+
+const position = computed(() => ({
+	x: store.throttleX * 100,
+	y: store.throttleY * 100,
+}));
+
+
+function controlStart(e) {
+	controlling.value = true;
+
+	pointerX = e.x;
+	pointerY = e.y;
+
+	$handle.value.setPointerCapture(e.pointerId);
+}
+function controlMove(e) {
+	if (! controlling.value) return;
+
+	store.throttleX = clamp(e.x - pointerX, -100, 100) / 100;
+	store.throttleY = clamp(e.y - pointerY, -100, 100) / 100;
+
+	// #sanitycheck: end control if we lose pointer capture (which somehow
+	// happens sometimes, though I'm not sure why.
+	if (! $handle.value.hasPointerCapture(e.pointerId))
+		controlEnd();
+}
+function controlEnd(e) {
+	controlling.value = false;
+
+	store.throttleX = pointerX = 0;
+	store.throttleY = pointerY = 0;
+
+	if (e && $handle.value.hasPointerCapture(e.pointerId))
+		$handle.value.releasePointerCapture(e.pointerId);
+}
+</script>
+
+
+
+<template>
+	<div class="joystick">
+		<form
+			class="joystick-position"
+			@submit.prevent
+		>
+			<input type="hidden" name="joystick-x" :value="position.x"/>
+			<input type="hidden" name="joystick-y" :value="position.y"/>
+		</form>
+
+		<svg
+			class="joystick-visual"
+			viewBox="-100 -100 200 200"
+			height="200"
+			width="200"
+			overflow="visible"
+			@pointerdown.stop="controlStart($event)"
+			@pointermove.stop="controlMove($event)"
+			@pointerup.stop="controlEnd($event)"
+		>
+			<rect
+				class="joystick-boundary"
+				height="200"
+				width="200"
+				x="-100"
+				y="-100"
+			/>
+			<circle
+				class="joystick-handle"
+				:cx="position.x"
+				:cy="position.y"
+				r="50"
+				ref="$handle"
+			/>
+		</svg>
+	</div>
+</template>
+
+
+
+<style>
+.joystick-visual {}
+.joystick-boundary {
+	fill: var(--bs-gray-300);
+	opacity: .5;
+}
+.joystick-handle {
+	fill: var(--bs-gray-600);
+	opacity: .5;
+}
+</style>

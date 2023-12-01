@@ -1,10 +1,17 @@
 <script setup>
-import Game from './components/Game.vue';
+import { provide } from 'vue';
+
+import store from '@/data/store';
+
+import Game from '@/components/Game.vue';
+
+
+provide('store', store);
 </script>
 
 <template>
 	<header>
-		<h1 class="display-1">Basic Game Loop</h1>
+		<h1 class="display-1">{{ store.title.trim() }}</h1>
 		<p class="lead">A sandbox.</p>
 	</header>
 
@@ -13,4 +20,8 @@ import Game from './components/Game.vue';
 	</main>
 </template>
 
-<style></style>
+<style>
+h1:empty::before {
+	content: '\0000A0';
+}
+</style>
