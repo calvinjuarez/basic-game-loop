@@ -35,6 +35,7 @@ const isPaused = ref(false);
 
 let isWindowFocussed = true;
 
+const SIZE = 32;
 
 window.addEventListener('blur', () => isWindowFocussed = false);
 window.addEventListener('focus', () => isWindowFocussed = true);
@@ -52,20 +53,31 @@ function update(stepTime) {
 function draw() {
 	if (! store.display) return;
 
-	store.display.fillStyle = store.color;
-	store.display.clearRect(0, 0, store.displayWidth, store.displayHeight);
-	store.display.fillRect(store.x - 16, store.y - 16, 32, 32); // avatar
+	const { display, displayWidth, displayHeight } = store;
+
+	display.clearRect(0, 0, displayWidth, displayHeight);
+
+	switch (store.avatarStyle) {
+		case 'box': {
+			display.fillStyle = store.color;
+			display.fillRect(store.x - SIZE / 2, store.y - SIZE / 2, SIZE, SIZE);
+			break;
+		}
+		default:
+			throw new Error(`Unrecognized avatarStyle ${JSON.stringify(avatarStyle)}`);
+	}
+
 
 	if (isPaused.value) {
 		const barWidth = 50;
 		const barHeight = 150;
-		const x = (store.displayWidth - barWidth) / 2;
-		const y = (store.displayHeight - barHeight) / 2;
+		const x = (displayWidth - barWidth) / 2;
+		const y = (displayHeight - barHeight) / 2;
 
-		store.display.fillStyle = '#00000033';
-		store.display.fillRect(0, 0, store.displayWidth, store.displayHeight);
-		store.display.fillRect(x - barWidth, y, barWidth, barHeight);
-		store.display.fillRect(x + barWidth, y, barWidth, barHeight);
+		display.fillStyle = '#00000033';
+		display.fillRect(0, 0, displayWidth, displayHeight);
+		display.fillRect(x - barWidth, y, barWidth, barHeight);
+		display.fillRect(x + barWidth, y, barWidth, barHeight);
 	}
 }
 
