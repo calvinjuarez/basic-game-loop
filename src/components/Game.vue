@@ -13,6 +13,7 @@ import { clamp } from '@/util/number.js';
 import GameControls from '@/components/GameControls.vue';
 
 import Clock from '@/game/Clock.js';
+import Sprite from '@/game/Sprite.js';
 
 
 const store = inject('store');
@@ -35,7 +36,8 @@ const isPaused = ref(false);
 
 let isWindowFocussed = true;
 
-const SIZE = 32;
+const sprite = new Sprite('/img/sprite-scarab.png');
+sprite.SIZE = 32;
 
 window.addEventListener('blur', () => isWindowFocussed = false);
 window.addEventListener('focus', () => isWindowFocussed = true);
@@ -47,13 +49,14 @@ function update(stepTime) {
 	const newX = stepTime * store.sensitivity * store.throttleX + store.x;
 	const newY = stepTime * store.sensitivity * store.throttleY + store.y;
 
-	store.x = clamp(newX, 16, store.displayWidth - 16);
-	store.y = clamp(newY, 16, store.displayHeight - 16);
+	store.x = clamp(newX, sprite.SIZE / 2, store.displayWidth - sprite.SIZE / 2);
+	store.y = clamp(newY, sprite.SIZE / 2, store.displayHeight - sprite.SIZE / 2);
 }
 function draw() {
 	if (! store.display) return;
 
 	const { display, displayWidth, displayHeight } = store;
+	const { SIZE } = sprite;
 
 	display.clearRect(0, 0, displayWidth, displayHeight);
 
@@ -98,6 +101,9 @@ const clock = new Clock(stepTime => {
 });
 
 clock.start();
+
+
+window.$game = { clock, store, sprite };
 
 
 onMounted(() => {
