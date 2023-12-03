@@ -39,6 +39,8 @@ let isWindowFocussed = true;
 const sprite = new Sprite('/img/sprite-scarab.png');
 sprite.SIZE = 32;
 
+const FRAME_LENGTH = 1000 / 30;
+let frameTimer = 0;
 let frame = 0;
 
 
@@ -54,6 +56,15 @@ function update(stepTime) {
 
 	store.x = clamp(newX, sprite.SIZE / 2, store.displayWidth - sprite.SIZE / 2);
 	store.y = clamp(newY, sprite.SIZE / 2, store.displayHeight - sprite.SIZE / 2);
+
+	if (store.throttle) {
+		if ((frameTimer += stepTime * Math.min(store.throttle, .5)) >= FRAME_LENGTH) {
+			frameTimer %= FRAME_LENGTH;
+			frame = ++frame % 4;
+		}
+	}
+	else
+		frame = 0;
 }
 function draw() {
 	if (! store.display) return;
