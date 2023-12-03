@@ -36,6 +36,11 @@ const store = reactive({
 
 		this.display.fillStyle = this.color;
 	},
+	unsetDisplay() {
+		this.display = null;
+		this.displayHeight = 0;
+		this.displayWidth = 0;
+	},
 });
 
 

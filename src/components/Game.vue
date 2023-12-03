@@ -1,10 +1,18 @@
 <script setup>
-import { ref, computed, inject, onMounted, watchEffect } from 'vue';
+import {
+	computed,
+	inject,
+	onBeforeUnmount,
+	onMounted,
+	ref,
+	watchEffect,
+} from 'vue';
+
 import { clamp } from '@/util/number.js';
 
-import Clock from '@/game/Clock.js';
-
 import GameControls from '@/components/GameControls.vue';
+
+import Clock from '@/game/Clock.js';
 
 
 const store = inject('store');
@@ -62,6 +70,11 @@ function draw() {
 }
 
 
+// pausing blocks updates from the clock, so to note that we've paused, we call
+// draw() one more time when the `isPaused` value changes to `true`.
+watchEffect(() => isPaused.value && draw());
+
+
 const clock = new Clock(stepTime => {
 	if (isPaused.value || ! isWindowFocussed) return;
 
@@ -84,9 +97,14 @@ onMounted(() => {
 	draw();
 });
 
-// pausing blocks updates from the clock, so to note that we've paused, we call
-// draw() one more time when the `isPaused` value changes to `true`.
-watchEffect(() => isPaused.value && draw());
+onBeforeUnmount(() => {
+	delete window.$game;
+
+	store.unsetDisplay();
+
+	store.x = 0;
+	store.y = 0;
+});
 </script>
 
 
