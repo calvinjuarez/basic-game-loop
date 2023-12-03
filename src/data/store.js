@@ -4,6 +4,7 @@ import { reactive, watchEffect } from 'vue'
 export class StoreTypeError extends TypeError {}
 
 const store = reactive({
+	avatarStyle: window.localStorage.getItem('avatar') || 'bug',
 	color: window.localStorage.getItem('color'),
 	display: null,
 	displayHeight: 0,
@@ -45,6 +46,7 @@ const store = reactive({
 
 
 watchEffect(() => window.localStorage.setItem('color', store.color));
+watchEffect(() => window.localStorage.setItem('avatar', store.avatarStyle));
 watchEffect(() => {
 	const { d, a, R, L } = store.inputs;
 

@@ -131,6 +131,11 @@ onBeforeUnmount(() => {
 					class="btn btn-outline-secondary"
 					@click="isDevHidden = ! isDevHidden"
 				>Toggle Dev Info</button>
+				<button
+					type="button"
+					class="btn btn-outline-secondary"
+					@click="store.avatarStyle = (store.avatarStyle === 'bug') ? 'box' : 'bug'"
+				>Switch to {{ (store.avatarStyle === 'bug') ? 'Box' : 'Bug' }}</button>
 			</div>
 		</aside>
 		<aside class="game-dev-info" v-if="! isDevHidden">
@@ -153,6 +158,8 @@ onBeforeUnmount(() => {
 			<dl class="dl-cols">
 				<dt>(x, y):</dt>
 				<dd><output>{{ `(${Math.round(store.x)}, ${Math.round(store.y)})` }}</output></dd>
+				<dt>avatarStyle:</dt>
+				<dd><output>{{ store.avatarStyle }}</output></dd>
 				<dt>inputs:</dt>
 				<dd><output>{{ inputs }}</output></dd>
 			</dl>
