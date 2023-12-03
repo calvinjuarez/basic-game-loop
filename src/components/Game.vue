@@ -94,11 +94,17 @@ function draw() {
 			helper.globalCompositeOperation = "destination-in"; // see https://stackoverflow.com/questions/45706829/change-color-image-in-canvas
 			helper.drawImage(sprite.img, FRAME, FILL, SIZE, SIZE, 0, 0, SIZE, SIZE);
 
+			// set rotation
+			display.translate(store.x, store.y);
+			display.rotate(store.facingAngle);
+			display.translate(-store.x, -store.y)
 			// draw the colorized fill
 			display.drawImage(helper.canvas, ...drawArea);
 			// draw the outline
 			display.fillStyle = '#000000';
 			display.drawImage(sprite.img, FRAME, OUTLINE, SIZE, SIZE, ...drawArea);
+			// reset rotation (and everything else)
+			display.setTransform(1, 0, 0, 1, 0, 0);
 			break;
 		}
 		default:
