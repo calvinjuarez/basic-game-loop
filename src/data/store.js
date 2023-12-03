@@ -22,6 +22,7 @@ const store = reactive({
 	sensitivity: 1,
 	throttleX: 0,
 	throttleY: 0,
+	throttle: 0,
 	title: 'Browser Game',
 	x: 0,
 	y: 0,
@@ -54,6 +55,12 @@ watchEffect(() => {
 	const { w, s, U, D } = store.inputs;
 
 	store.throttleY = (.9 * (s || D)) + (-.9 * (w || U));
+});
+watchEffect(() => {
+	const { throttleX, throttleY } = store;
+	const throttle = Math.sqrt(throttleX ** 2 + throttleY ** 2)
+
+	store.throttle = throttle;
 });
 
 
