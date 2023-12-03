@@ -34,8 +34,6 @@ const store = reactive({
 		this.display = canvas.getContext('2d');
 		this.displayWidth = canvas.width;
 		this.displayHeight = canvas.height;
-
-		this.display.fillStyle = this.color;
 	},
 	unsetDisplay() {
 		this.display = null;

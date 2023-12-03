@@ -39,6 +39,9 @@ let isWindowFocussed = true;
 const sprite = new Sprite('/img/sprite-scarab.png');
 sprite.SIZE = 32;
 
+let frame = 0;
+
+
 window.addEventListener('blur', () => isWindowFocussed = false);
 window.addEventListener('focus', () => isWindowFocussed = true);
 
@@ -64,6 +67,38 @@ function draw() {
 		case 'box': {
 			display.fillStyle = store.color;
 			display.fillRect(store.x - SIZE / 2, store.y - SIZE / 2, SIZE, SIZE);
+			break;
+		}
+		case 'bug': {
+			// see https://spicyyoghurt.com/tutorials/html5-javascript-game-development/images-and-sprite-animations
+			const SCALE = 4;
+			const OUTLINE = 0 * SIZE;
+			const FILL = 1 * SIZE;
+			const Frames = [ 0, 1, 0, 2 ];
+			const FRAME = Frames[frame] * SIZE;
+			const RENDER_SIZE = SIZE * SCALE;
+			const drawArea = [
+				store.x - (RENDER_SIZE / 2),
+				store.y - (RENDER_SIZE / 2),
+				RENDER_SIZE,
+				RENDER_SIZE,
+			];
+
+			const helper = document.createElement('canvas').getContext('2d');
+
+			// generate the colorized fill
+			helper.canvas.width = SIZE;
+			helper.canvas.height = SIZE;
+			helper.fillStyle = store.color;
+			helper.fillRect(0, 0, SIZE, SIZE);
+			helper.globalCompositeOperation = "destination-in"; // see https://stackoverflow.com/questions/45706829/change-color-image-in-canvas
+			helper.drawImage(sprite.img, FRAME, FILL, SIZE, SIZE, 0, 0, SIZE, SIZE);
+
+			// draw the colorized fill
+			display.drawImage(helper.canvas, ...drawArea);
+			// draw the outline
+			display.fillStyle = '#000000';
+			display.drawImage(sprite.img, FRAME, OUTLINE, SIZE, SIZE, ...drawArea);
 			break;
 		}
 		default:
