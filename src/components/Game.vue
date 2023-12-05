@@ -1,5 +1,5 @@
 <script setup>
-import { inject, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
+import { inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 import { clamp } from '@/util/number.js';
 
@@ -117,7 +117,7 @@ function draw() {
 
 // pausing blocks updates from the clock, so to note that we've paused, we call
 // draw() one more time when the `isPaused` value changes to `true`.
-watchEffect(() => store.isPaused && draw());
+watch(() => store.isPaused, () => store.isPaused && draw());
 
 
 const clock = new Clock(stepTime => {
