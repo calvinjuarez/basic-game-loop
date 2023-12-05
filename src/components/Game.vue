@@ -188,8 +188,8 @@ onBeforeUnmount(() => {
 			width="1600"
 			height="900"
 		></canvas>
-		<Joystick/>
-		<Settings/>
+		<Joystick class="game-control"/>
+		<Settings class="game-settings"/>
 		<aside class="game-dev-tools">
 			<h5>Dev Tools</h5>
 			<div class="game-dev-tools-bar">
@@ -243,16 +243,30 @@ onBeforeUnmount(() => {
 
 <style>
 .game {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: start;
+	display: grid;
 	gap: var(--spacer-2);
+	grid-template-columns: 200px auto;
+
+	@media only screen and (min-width: 576px) {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: start;
+	}
+}
+.game-display,
+.game-dev-info,
+.game-dev-tools {
+	grid-column-start: span 2;
 }
 .game-display {
 	outline: 1px solid #b9b9b9; /* don't wanna add space to the box model */
 	width: 100%;
 	max-width: 400px;
 }
+.game-control {
+	order: '3';
+}
+.game-settings {}
 .game-dev-info {}
 .game-dev-tools {
 	width: 100%;
