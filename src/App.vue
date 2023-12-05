@@ -17,8 +17,8 @@ provide('store', store);
 	</header>
 
 	<main>
-		<Game/>
-		<Dev/>
+		<Game class="section"/>
+		<Dev class="section"/>
 	</main>
 </template>
 

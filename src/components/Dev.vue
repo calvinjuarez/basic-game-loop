@@ -23,7 +23,7 @@ const xy = computed(() => `(${Math.round(store.x)}, ${Math.round(store.y)})`);
 
 <template>
 	<div class="dev">
-		<aside class="dev-tools">
+		<aside class="dev-tools  section">
 			<h5>Dev Tools</h5>
 			<div class="dev-tools-bar">
 				<button
@@ -43,15 +43,15 @@ const xy = computed(() => `(${Math.round(store.x)}, ${Math.round(store.y)})`);
 				>Switch to {{ (store.avatarStyle === 'bug') ? 'Box' : 'Bug' }}</button>
 			</div>
 		</aside>
-		<aside class="dev-info" v-if="! isDevHidden">
+		<aside class="dev-info  section" v-if="! isDevHidden">
 			<h5>Dev Info</h5>
 			<h6>Performance</h6>
-			<dl class="dl-cols">
+			<dl class="dl-cols  ms-2 mb-0">
 				<dt>fps:</dt>
 				<dd><output>{{ store.dev.fps }}</output></dd>
 			</dl>
 			<h6>Display</h6>
-			<dl class="dl-cols">
+			<dl class="dl-cols  ms-2 mb-0">
 				<dt>pixel dimensions:</dt>
 				<dd><output>{{ displayPxSize }}</output></dd>
 				<dt>dimensions on screen:</dt>
@@ -60,7 +60,7 @@ const xy = computed(() => `(${Math.round(store.x)}, ${Math.round(store.y)})`);
 				<dd><output>{{ store.color }}</output></dd>
 			</dl>
 			<h6>Game</h6>
-			<dl class="dl-cols">
+			<dl class="dl-cols  ms-2 mb-0">
 				<dt>position (x, y):</dt>
 				<dd><output>{{ xy }}</output></dd>
 				<dt>inputs:</dt>
