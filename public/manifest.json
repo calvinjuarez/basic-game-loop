@@ -1,0 +1,7 @@
+{
+	"name": "Browser Game",
+	"start_url": "/",
+	"theme_color": "#face75",
+	"background_color": "#ffffff",
+	"display": "standalone"
+}
