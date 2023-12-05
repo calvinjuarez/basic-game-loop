@@ -53,16 +53,22 @@ const store = reactive({
 watchEffect(() => window.localStorage.setItem('color', store.color));
 watchEffect(() => window.localStorage.setItem('avatar', store.avatarStyle));
 watchEffect(() => {
+	if (store.isPaused) return;
+
 	const { d, a, R, L } = store.inputs;
 
 	store.throttleX = (.9 * (d || R)) + (-.9 * (a || L));
 });
 watchEffect(() => {
+	if (store.isPaused) return;
+
 	const { w, s, U, D } = store.inputs;
 
 	store.throttleY = (.9 * (s || D)) + (-.9 * (w || U));
 });
 watchEffect(() => {
+	if (store.isPaused) return;
+
 	const { throttleX, throttleY } = store;
 	const throttle = Math.sqrt(throttleX ** 2 + throttleY ** 2)
 
