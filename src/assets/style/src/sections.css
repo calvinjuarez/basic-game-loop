@@ -1,0 +1,8 @@
+/**
+ * Sectioning
+ */
+
+
+.section {
+	margin-bottom: var(--spacer-2);
+}
