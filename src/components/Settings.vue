@@ -55,11 +55,11 @@ onMounted(() => {
 	display: block;
 }
 .setting input[type="color"] {
-	height: calc(1.5rem + (2 * 0.375rem));
+	height: 2.4rem;
 
 	&::-webkit-color-swatch-wrapper {
 		height: 1rem;
-		margin-top: .1875rem;
+		margin-top: .25rem;
 	}
 	&::-webkit-color-swatch {}
 }
