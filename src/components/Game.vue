@@ -10,7 +10,7 @@ import {
 
 import { clamp } from '@/util/number.js';
 
-import GameControls from '@/components/GameControls.vue';
+import Settings from '@/components/Settings.vue';
 import Joystick from '@/components/Joystick.vue';
 
 import Clock from '@/game/Clock.js';
@@ -189,7 +189,7 @@ onBeforeUnmount(() => {
 			height="900"
 		></canvas>
 		<Joystick/>
-		<GameControls/>
+		<Settings/>
 		<aside class="game-dev-tools">
 			<h5>Dev Tools</h5>
 			<div class="game-dev-tools-bar">

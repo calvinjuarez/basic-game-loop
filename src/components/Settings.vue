@@ -29,12 +29,12 @@ onMounted(() => {
 
 
 <template>
-	<div class="game-controls">
-		<label class="game-control-traditional  control-label">
+	<div class="settings">
+		<label class="setting  control-label">
 			Title:
 			<input type="text" class="form-control" v-model="store.title" @keydown.stop/>
 		</label>
-		<label class="game-control-traditional  control-label">
+		<label class="setting  control-label">
 			Color:
 			<input type="color" class="form-control" v-model="store.color" @keydown.stop/>
 		</label>
@@ -44,14 +44,17 @@ onMounted(() => {
 
 
 <style>
-.game-controls {}
-.game-control-traditional {
+.settings {}
+.setting {
 	display: flex;
 	gap: var(--spacer-1);
 	align-items: baseline;
 	margin-bottom: var(--spacer-1);
 }
-.game-control-traditional input[type="color"] {
+.setting input {
+	display: block;
+}
+.setting input[type="color"] {
 	height: calc(1.5rem + (2 * 0.375rem));
 
 	&::-webkit-color-swatch-wrapper {
