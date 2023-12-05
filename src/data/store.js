@@ -5,7 +5,7 @@ export class StoreTypeError extends TypeError {}
 
 const store = reactive({
 	avatarStyle: window.localStorage.getItem('avatar') || 'bug',
-	color: window.localStorage.getItem('color') || '#5ad',
+	color: window.localStorage.getItem('color') || '#55aadd',
 	display: null,
 	displayHeight: 0,
 	displayWidth: 0,
