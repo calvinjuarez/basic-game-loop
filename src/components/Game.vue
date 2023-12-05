@@ -11,6 +11,7 @@ import {
 import { clamp } from '@/util/number.js';
 
 import GameControls from '@/components/GameControls.vue';
+import Joystick from '@/components/Joystick.vue';
 
 import Clock from '@/game/Clock.js';
 import Sprite from '@/game/Sprite.js';
@@ -187,6 +188,7 @@ onBeforeUnmount(() => {
 			width="1600"
 			height="900"
 		></canvas>
+		<Joystick/>
 		<GameControls/>
 		<aside class="game-dev-tools">
 			<h5>Dev Tools</h5>

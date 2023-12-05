@@ -1,8 +1,6 @@
 <script setup>
 import { inject, onMounted } from 'vue';
 
-import Joystick from '@/components/Joystick.vue';
-
 
 const store = inject('store');
 
@@ -32,31 +30,34 @@ onMounted(() => {
 
 <template>
 	<div class="game-controls">
-		<Joystick/>
-		<div>
-			<label class="game-control-traditional  control-label">
-				Title:
-				<input type="text" class="form-control" v-model="store.title" @keydown.stop/>
-			</label>
-			<label class="game-control-traditional  control-label">
-				Color:
-				<input type="color" class="form-control" v-model="store.color" @keydown.stop/>
-			</label>
-		</div>
+		<label class="game-control-traditional  control-label">
+			Title:
+			<input type="text" class="form-control" v-model="store.title" @keydown.stop/>
+		</label>
+		<label class="game-control-traditional  control-label">
+			Color:
+			<input type="color" class="form-control" v-model="store.color" @keydown.stop/>
+		</label>
 	</div>
 </template>
 
 
 
 <style>
-.game-controls {
-	display: flex;
-	gap: var(--spacer-2);
-}
+.game-controls {}
 .game-control-traditional {
 	display: flex;
 	gap: var(--spacer-1);
 	align-items: baseline;
 	margin-bottom: var(--spacer-1);
+}
+.game-control-traditional input[type="color"] {
+	height: calc(1.5rem + (2 * 0.375rem));
+
+	&::-webkit-color-swatch-wrapper {
+		height: 1rem;
+		margin-top: .1875rem;
+	}
+	&::-webkit-color-swatch {}
 }
 </style>
