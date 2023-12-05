@@ -36,6 +36,12 @@ export class ClockRequestAnimationFrameUnavailableError extends Error {}
  */
 export default class Clock {
 	constructor(onTick, options) {
+		if (options)
+			/** Archival copy of options as passed.
+			  * @readonly
+			  * @var {*} GameObject#_o */
+			Object.defineProperty(this, '_o', { value: options });
+
 		if (typeof onTick !== 'function')
 			throw new ClockArgumentTypeError(`'onTick' must be a function`);
 
@@ -88,9 +94,6 @@ export default class Clock {
 	/** Used to collect frame numbers over the sampling interval.
 	  * @var {number} */
 	#framesThisSecond = 0;
-	/** Latest measured FPS, or null if FPS measurement is off.
-	  * @var {?number} */
-	_FPS = null;
 
 
 	#onFPSChange() {
@@ -153,6 +156,23 @@ export default class Clock {
 	}
 
 
+	/** Latest measured FPS, or null if FPS measurement is off.
+	  * @var {?number} */
+	_FPS = null;
+
+
+	/**
+	 * @param {object} options
+	 * @returns {this}
+	 */
+	setOptions(options) {
+		if (! options) return;
+
+		// @TODO pluck official options to only what's expected
+		Object.assign(this.options, options);
+
+		return this;
+	}
 	/**
 	 * Start the clock.
 	 */
@@ -163,7 +183,6 @@ export default class Clock {
 
 		this.#onStarted();
 	}
-
 	/**
 	 * Enable or disable the internal measure of frame rate.  You can have it
 	 * begin enabled by passing `doMeasureFPS` to the constructor.
@@ -185,6 +204,8 @@ export default class Clock {
 		return this.#doMeasureFPS;
 	}
 }
+
+Object.defineProperty(Clock.prototype, Symbol.toStringTag, { value: 'Clock' });
 
 
 /**

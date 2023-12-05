@@ -71,6 +71,10 @@ function controlEnd(e) {
 			@pointerdown.stop="controlStart($event)"
 			@pointermove.stop="controlMove($event)"
 			@pointerup.stop="controlEnd($event)"
+			@touchstart.stop.prevent
+			@touchmove.stop.prevent
+			@mousedown.stop.prevent
+			@mousemove.stop.prevent
 		>
 			<rect
 				class="joystick-boundary"
