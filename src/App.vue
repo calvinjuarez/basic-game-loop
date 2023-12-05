@@ -3,6 +3,7 @@ import { provide } from 'vue';
 
 import store from '@/data/store';
 
+import Dev from '@/components/Dev.vue';
 import Game from '@/components/Game.vue';
 
 
@@ -17,6 +18,7 @@ provide('store', store);
 
 	<main>
 		<Game/>
+		<Dev/>
 	</main>
 </template>
 

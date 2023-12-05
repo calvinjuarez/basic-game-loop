@@ -20,6 +20,7 @@ const store = reactive({
 		U: false,
 		D: false,
 	},
+	isPaused: false,
 	sensitivity: 1,
 	throttleX: 0,
 	throttleY: 0,
@@ -27,6 +28,10 @@ const store = reactive({
 	title: 'Browser Game',
 	x: 0,
 	y: 0,
+
+	dev: {
+		fps: '0',
+	},
 
 	setDisplay(canvas) {
 		if (! canvas instanceof HTMLCanvasElement)
