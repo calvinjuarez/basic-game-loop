@@ -4,7 +4,7 @@ import { inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { clamp } from '@/util/number.js';
 
 import Settings from '@/components/Settings.vue';
-import Joystick from '@/components/Joystick.vue';
+import Controls from '@/components/Controls.vue';
 
 import Clock from '@/game/Clock.js';
 import Sprite from '@/game/Sprite.js';
@@ -115,11 +115,6 @@ function draw() {
 }
 
 
-// pausing blocks updates from the clock, so to note that we've paused, we call
-// draw() one more time when the `isPaused` value changes to `true`.
-watch(() => store.isPaused, () => store.isPaused && draw());
-
-
 const clock = new Clock(stepTime => {
 	if (store.isPaused || ! isWindowFocussed) return;
 
@@ -134,6 +129,11 @@ clock.start();
 
 
 window.$game = { clock, store, sprite };
+
+
+// pausing blocks updates from the clock, so to note that we've paused, we call
+// draw() one more time when the `isPaused` value changes to `true`.
+watch(() => store.isPaused, () => store.isPaused && draw());
 
 
 onMounted(() => {
@@ -165,7 +165,7 @@ onBeforeUnmount(() => {
 			width="1600"
 			height="900"
 		></canvas>
-		<Joystick class="game-control"/>
+		<Controls class="game-controls"/>
 		<Settings class="game-settings"/>
 	</div>
 </template>
@@ -190,7 +190,7 @@ onBeforeUnmount(() => {
 	width: 100%;
 	max-width: 400px;
 }
-.game-control {
+.game-controls {
 	@media only screen and (max-width: 575px) {
 		order: 1;
 	}
