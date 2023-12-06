@@ -5,14 +5,18 @@ const asyncImage = () => { const img = new Image(); img.decoding = 'async'; retu
 
 /**
  * @param {string} src  The path to the sprite image file.
- * @param {object} [options]
- * @param {boolean} [options.lazy=false]  Whether to load the image during
- *   construction or wait for an explicit call to {@link #load}.
+ * @param {Sprite~options} [options]
+ * @param {number} [fps=0]
+ * @param {?number|number[]} [frames]
+ * @param {boolean} [options.lazy=false]
+ * @param {?number|string|{height:number|string,width:number|string}} [size]
+ * @param {Sprite~throttle} [throttle]
  */
 export default class Sprite {
 	constructor(src, options) {
 		this.#setArchivalProps(src, options);
 		this.#setOptions(options);
+		this.#initAnimation();
 
 		this.src = src;
 
@@ -28,9 +32,36 @@ export default class Sprite {
 			size: null,
 			throttle: stepTime => stepTime,
 		};
+		/**
+		 * @callback Sprite~throttle
+		 * @param {number} stepTime
+		 * @returns {number}  Modified step time to use for animation timing.
+		 */
+		/**
+		 * @typedef {object} Sprite~options
+		 * @property {number} fps
+		 * 	The max frame rate of the sprite animation.
+		 * @property {?number|number[]} frames
+		 * 	Either the number of frames, or an array of frame indexes listing
+		 * 	which frames should play in what order.
+		 * @property {boolean} lazy
+		 * 	Whether to load the image during construction or wait for an
+		 * 	explicit call to {@link #load}.
+		 * @property {?number|string|{height:number|string,width:number|string}} size
+		 * 	Either a number or string in format '{NUMBER}' specifying the pixel
+		 * 	length of the height and width of the frame tile, or an object of 2
+		 * 	such numbers or strings specifying the height and width separately.
+		 * @property {Sprite~throttle} throttle
+		 * 	A function taking a number input representing the step time, and
+		 * 	and returning a number representing by how much the frame timer
+		 * 	should be increased.
+		 */
 	}
 
 
+	#frame = 0;
+	#frameDuration = 0;
+	#frameTime = 0;
 	#hasAnimation = false;
 	#loadPromise = null;
 	#readyState = 'pending';
@@ -44,6 +75,15 @@ export default class Sprite {
 			});
 
 		this.#loadPromise.then(() => { this.#readyState = 'loaded'; });
+	}
+	#initAnimation() {
+		this.#hasAnimation = (
+			this.options.fps > 0 && this.options.frames.length > 1
+		);
+
+		if (! this.#hasAnimation) return;
+
+		this.#frameDuration = 1000 / this.options.fps;
 	}
 	#load() {
 		this.#readyState = 'loading';
@@ -79,14 +119,22 @@ export default class Sprite {
 		}
 
 		Object.assign(this.options, options);
-
-		this.#hasAnimation = (this.options.fps < 1 && this.options.frames < 2);
 	}
 	#validateOptions(options) {
 		const hasOption = prop => (
 			Object.hasOwn(options, prop)
 			&& options[prop] != null // options are optional
 		);
+		const validateNumeric = (name, value) => {
+			if (typeof value === 'string')
+				value = parseInt(value, 10);
+
+			if (typeof value !== 'number'
+			||  Number.isNaN(value))
+				throw new SpriteOptionError(
+					`'${name}' must be a number (${JSON.stringify(value)})`,
+				);
+		}
 
 		// boolean
 		[ 'lazy' ].forEach(option => {
@@ -96,20 +144,30 @@ export default class Sprite {
 		});
 
 		// numeric
-		[ 'fps', 'frames' ].forEach(option => {
+		[ 'fps' ].forEach(option => {
 			if (! hasOption(option)) return;
 
 			let value = options[option];
 
-			if (typeof value === 'string')
-				value = parseInt(value, 10);
-
-			if (typeof value !== 'number'
-			||  Number.isNaN(value))
-				throw new SpriteOptionError(
-					`'${option}' must be a number (${JSON.stringify(value)})`,
-				);
+			validateNumeric(option, value);
 		});
+
+		if (hasOption('frames')) {
+			let { frames } = options;
+
+			if (Array.isArray(frames))
+				frames.forEach((frame, i) => {
+					if (typeof frame !== 'number')
+						throw new SpriteOptionError(
+							`Invalid 'frames' (index '${i}' in ${JSON.stringify(options.frames)})`,
+						);
+				});
+			else if (typeof frames === 'number') {
+				options.frames = [];
+
+				for (let i = 0; i < frames; i++) options.frames.push(i);
+			}
+		}
 
 		if (this.options.fps > 0
 		&&  this.options.frames > 1
@@ -119,7 +177,7 @@ export default class Sprite {
 			);
 
 		if (hasOption('size')) {
-			let size = options.size;
+			let { size } = options;
 			let height, width;
 
 			const error = () => new SpriteOptionError(
@@ -194,7 +252,14 @@ export default class Sprite {
 
 	/** @var {string} */
 	get readyState() { return this.#readyState; }
-
+	/** @var {?object} */
+	get size() { return this.options.size; }
+	/** @var {number} */
+	get frameLocation() {
+		return this.#hasAnimation
+			? this.options.frames[this.#frame] * this.options.size.width
+			: 0;
+	}
 
 
 	/**
@@ -213,17 +278,42 @@ export default class Sprite {
 		if (! options) return;
 
 		this.#setOptions(options);
+		this.#initAnimation();
 
 		return this;
 	}
 	/**
-	 * Method to update the animation
+	 * @param {number} frame  The frame index to render.
+	 */
+	skipToFrame(frame) {
+		frame = parseInt(frame, 10);
+
+		if (Number.isNaN(frame) || frame < 0)
+			throw new SpriteError(`Invalid frame ${JSON.stringify(frame)}`);
+		if (frame > this.options.frames.length)
+			throw new SpriteError(`Frame ${frame} does not exist`);
+
+		// set animation to the start of the given frame
+		this.#frame = frame;
+		this.#frameTime = 0;
+	}
+	/**
+	 * Method to update the animation frame based on the time elapsed since the
+	 * previous update.
+	 * @param {number} stepTime
 	 */
 	update(stepTime) {
-		const { fps, frames, size } = this.options;
+		const { fps, frames, size, throttle } = this.options;
 
 		if (! this.#hasAnimation) return;
 
-		const throttledTime = this.options.throttle(stepTime);
+		this.#frameTime += throttle(stepTime);
+
+		// When we've accumulated enough time in the current animation frame, we
+		// move to the next frame and start the count over again.
+		if (this.#frameTime >= this.#frameDuration) {
+			this.#frameTime %= this.#frameDuration;
+			this.#frame = (this.#frame + 1) % this.options.frames.length;
+		}
 	}
 }
