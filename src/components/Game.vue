@@ -14,16 +14,12 @@ const store = inject('store');
 
 let isWindowFocussed = true;
 
-const sprite = new Sprite('/img/sprite-scarab.png');
-sprite.SIZE = 32;
-
-const FRAME_LENGTH = 1000 / 30;
-let frameTimer = 0;
-let frame = 0;
-
-
-window.addEventListener('blur', () => isWindowFocussed = false);
-window.addEventListener('focus', () => isWindowFocussed = true);
+const sprite = new Sprite('/img/sprite-scarab.png', {
+	fps: 30,
+	frames: [ 0, 1, 0, 2 ],
+	size: 32,
+	throttle(stepTime) { return stepTime * Math.min(store.throttle, .5); },
+});
 
 
 function update(stepTime) {
@@ -32,56 +28,51 @@ function update(stepTime) {
 	const newX = stepTime * store.sensitivity * store.throttleX + store.x;
 	const newY = stepTime * store.sensitivity * store.throttleY + store.y;
 
-	store.x = clamp(newX, sprite.SIZE / 2, store.displayWidth - sprite.SIZE / 2);
-	store.y = clamp(newY, sprite.SIZE / 2, store.displayHeight - sprite.SIZE / 2);
+	const { width, height } = sprite.size;
 
-	if (store.throttle) {
-		if ((frameTimer += stepTime * Math.min(store.throttle, .5)) >= FRAME_LENGTH) {
-			frameTimer %= FRAME_LENGTH;
-			frame = ++frame % 4;
-		}
-	}
+	store.x = clamp(newX, width / 2, store.displayWidth - width / 2);
+	store.y = clamp(newY, height / 2, store.displayHeight - height / 2);
+
+	if (store.throttle)
+		sprite.update(stepTime);
 	else
-		frame = 0;
+		sprite.skipToFrame(0);
 }
 function draw() {
 	if (! store.display) return;
 
 	const { display, displayWidth, displayHeight } = store;
-	const { SIZE } = sprite;
+	const { width, height } = sprite.size;
 
 	display.clearRect(0, 0, displayWidth, displayHeight);
 
 	switch (store.avatarStyle) {
 		case 'box': {
 			display.fillStyle = store.color;
-			display.fillRect(store.x - SIZE / 2, store.y - SIZE / 2, SIZE, SIZE);
+			display.fillRect(store.x - width / 2, store.y - height / 2, width, height);
 			break;
 		}
 		case 'bug': {
 			// see https://spicyyoghurt.com/tutorials/html5-javascript-game-development/images-and-sprite-animations
 			const SCALE = 4;
-			const OUTLINE = 0 * SIZE;
-			const FILL = 1 * SIZE;
-			const Frames = [ 0, 1, 0, 2 ];
-			const FRAME = Frames[frame] * SIZE;
-			const RENDER_SIZE = SIZE * SCALE;
+			const OUTLINE = 0 * height;
+			const FILL = 1 * height;
 			const drawArea = [
-				store.x - (RENDER_SIZE / 2),
-				store.y - (RENDER_SIZE / 2),
-				RENDER_SIZE,
-				RENDER_SIZE,
+				store.x - (SCALE * width / 2),
+				store.y - (SCALE * height / 2),
+				SCALE * width,
+				SCALE * height,
 			];
 
 			const helper = document.createElement('canvas').getContext('2d');
 
 			// generate the colorized fill
-			helper.canvas.width = SIZE;
-			helper.canvas.height = SIZE;
+			helper.canvas.width = width;
+			helper.canvas.height = height;
 			helper.fillStyle = store.color;
-			helper.fillRect(0, 0, SIZE, SIZE);
-			helper.globalCompositeOperation = "destination-in"; // see https://stackoverflow.com/questions/45706829/change-color-image-in-canvas
-			helper.drawImage(sprite.img, FRAME, FILL, SIZE, SIZE, 0, 0, SIZE, SIZE);
+			helper.fillRect(0, 0, width, height);
+			helper.globalCompositeOperation = 'destination-in'; // see https://stackoverflow.com/questions/45706829/change-color-image-in-canvas
+			helper.drawImage(sprite.img, sprite.frameLocation, FILL, width, height, 0, 0, width, height);
 
 			// set rotation
 			display.translate(store.x, store.y);
@@ -91,7 +82,7 @@ function draw() {
 			display.drawImage(helper.canvas, ...drawArea);
 			// draw the outline
 			display.fillStyle = '#000000';
-			display.drawImage(sprite.img, FRAME, OUTLINE, SIZE, SIZE, ...drawArea);
+			display.drawImage(sprite.img, sprite.frameLocation, OUTLINE, width, height, ...drawArea);
 			// reset rotation (and everything else)
 			display.setTransform(1, 0, 0, 1, 0, 0);
 			break;
@@ -137,6 +128,9 @@ watch(() => store.isPaused, () => store.isPaused && draw());
 
 
 onMounted(() => {
+	window.addEventListener('blur', () => isWindowFocussed = false);
+	window.addEventListener('focus', () => isWindowFocussed = true);
+
 	store.setDisplay(document.getElementById('game-display'));
 
 	store.x = store.displayWidth / 2;
