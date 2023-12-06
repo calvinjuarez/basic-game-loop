@@ -176,7 +176,7 @@ onBeforeUnmount(() => {
 .game {
 	display: grid;
 	gap: var(--spacer-2);
-	grid-template-columns: 200px auto;
+	grid-template-columns: auto 200px;
 
 	@media only screen and (min-width: 576px) {
 		display: flex;
