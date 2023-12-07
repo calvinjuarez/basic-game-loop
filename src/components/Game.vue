@@ -179,6 +179,7 @@ onBeforeUnmount(() => {
 	}
 }
 .game-display {
+	justify-self: center;
 	grid-column-start: span 2;
 	outline: 1px solid #b9b9b9; /* don't wanna add space to the box model */
 	width: 100%;
