@@ -321,17 +321,22 @@ export default class Sprite {
 	/** @var {object} */
 	options = Object.assign({}, this.constructor.DEFAULTS);
 
-	/** @var {string} */
-	get readyState() { return this.#readyState; }
-	/** @var {?object} */
-	get size() { return this.options.size; }
-	/** @var {number} */
+	/** The pixel location of the current frame in the img.
+	  * @readonly
+	  * @var {number} */
 	get frameLocation() {
 		return this.#hasAnimation
 			? this.options.frames[this.#frame] * this.options.size.width
 			: 0;
 	}
-	/** @var {?string} */
+	/** @readonly
+	  * @var {string} */
+	get readyState() { return this.#readyState; }
+	/** @readonly
+	  * @var {object} */
+	get size() { return this.options.size; }
+	/** @readonly
+	  * @var {?string} */
 	get src() { return this.#src; }
 
 
