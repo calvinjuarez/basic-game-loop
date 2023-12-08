@@ -1,4 +1,5 @@
 export class SpriteError extends Error {}
+export class SpriteCancelLoadError extends SpriteError {}
 export class SpriteOptionError extends SpriteError {}
 
 const asyncImage = () => { const img = new Image(); img.decoding = 'async'; return img; };
@@ -81,6 +82,7 @@ export default class Sprite {
 	#imgFrames = null;
 	#imgLayers = null;
 	#loadPromise = null;
+	#loadPromiseCancel = () => {};
 	#readyState = ReadyState.PENDING;
 
 
@@ -89,14 +91,37 @@ export default class Sprite {
 			this.#loadPromise = new Promise((resolve, reject) => {
 				this.img.onload = resolve;
 				this.img.onerror = reject;
+				this.#loadPromiseCancel = data => reject(
+					Object.assign(new SpriteCancelLoadError(
+						`Sprite image loading cancelled.`,
+					), { data }),
+				);
 			});
 
 		this.#loadPromise
+			.finally(() => {
+				this.#loadPromiseCancel = () => {};
+			})
 			.then(() => {
 				this.#imgFrames = Math.ceil(this.img.width / this.options.size.width);
 				this.#imgLayers = Math.ceil(this.img.height / this.options.size.height);
 
 				this.#readyState = ReadyState.READY;
+			})
+			.catch(error => {
+				if (error instanceof SpriteCancelLoadError) {
+					this.#readyState = ReadyState.PENDING;
+					this.DEBUG && console.log(error.message);
+				}
+				else {
+					this.#readyState = ReadyState.ERROR;
+					this.loadError = error;
+					this.DEBUG && console.error(
+						`Sprite image load failed with error ${error.message}`,
+					);
+				}
+
+				return error;
 			});
 	}
 	#initAnimation() {
@@ -272,6 +297,8 @@ export default class Sprite {
 	DEBUG = this.constructor.DEBUG;
 	/** @var {Image} */
 	img = asyncImage();
+	/** @var {?Error} */
+	loadError = null;
 	/** @var {object} */
 	options = Object.assign({}, this.constructor.DEFAULTS);
 
@@ -287,6 +314,20 @@ export default class Sprite {
 	}
 
 
+	/**
+	 * Cancel the image loading.  If no loading is in progress, this silently
+	 * does nothing.
+	 * @param {object} data
+	 */
+	cancelLoad(data) {
+		this.#loadPromiseCancel(data);
+
+		this.DEBUG && console.log(
+			this.readyState === ReadyState.LOADING
+				? 'Image loading cancelled'
+				: `Image was not loading (readyState was '${this.readyState}'`,
+		);
+	}
 	/**
 	 * @returns {Promise}
 	 */
