@@ -5,7 +5,13 @@ export class SpriteOutOfBoundsError extends SpriteError {}
 export class SpriteTypeError extends TypeError {}
 export class SpriteSrcTypeError extends SpriteTypeError {}
 
-const asyncImage = () => { const img = new Image(); img.decoding = 'async'; return img; };
+
+const asyncImage = () => {
+	const img = new Image();
+	img.decoding = 'async';
+
+	return img;
+};
 
 /** @enum {string}
   * @memberof Sprite */
@@ -215,7 +221,7 @@ export default class Sprite {
 			if (typeof value !== 'number'
 			||  Number.isNaN(value))
 				throw new SpriteOptionError(
-					`'${name}' must be a number (${JSON.stringify(value)})`,
+					`'${name}' option must be a number (${JSON.stringify(value)})`,
 				);
 		}
 
