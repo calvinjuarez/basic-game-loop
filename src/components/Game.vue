@@ -55,8 +55,9 @@ function draw() {
 		case 'bug': {
 			// see https://spicyyoghurt.com/tutorials/html5-javascript-game-development/images-and-sprite-animations
 			const SCALE = 4;
-			const OUTLINE = 0 * height;
-			const FILL = 1 * height;
+			const FRAME = sprite.framePx;
+			const OUTLINE = sprite.getLayerPx(0);
+			const FILL = sprite.getLayerPx(1);
 			const drawArea = [
 				store.x - (SCALE * width / 2),
 				store.y - (SCALE * height / 2),
@@ -72,7 +73,7 @@ function draw() {
 			helper.fillStyle = store.color;
 			helper.fillRect(0, 0, width, height);
 			helper.globalCompositeOperation = 'destination-in'; // see https://stackoverflow.com/questions/45706829/change-color-image-in-canvas
-			helper.drawImage(sprite.img, sprite.frameLocation, FILL, width, height, 0, 0, width, height);
+			helper.drawImage(sprite.img, FRAME, FILL, width, height, 0, 0, width, height);
 
 			// set rotation
 			display.translate(store.x, store.y);
@@ -82,7 +83,7 @@ function draw() {
 			display.drawImage(helper.canvas, ...drawArea);
 			// draw the outline
 			display.fillStyle = '#000000';
-			display.drawImage(sprite.img, sprite.frameLocation, OUTLINE, width, height, ...drawArea);
+			display.drawImage(sprite.img, FRAME, OUTLINE, width, height, ...drawArea);
 			// reset rotation (and everything else)
 			display.setTransform(1, 0, 0, 1, 0, 0);
 			break;

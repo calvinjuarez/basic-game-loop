@@ -151,6 +151,48 @@ export default class Sprite {
 				return error;
 			});
 	}
+	#getPx(type, index) {
+		if (this.readyState === ReadyState.ERROR)
+			throw new SpriteError(
+				`Image ${this.src} failed to load.`,
+			);
+
+		const Values = {
+			frame: {
+				count: this.#imgFrames,
+				dimension: 'width',
+				titleType: 'Frame',
+			},
+			layer: {
+				count: this.#imgLayers,
+				dimension: 'height',
+				titleType: 'Layer',
+			},
+		};
+
+		if (! Object.keys(Values).includes(type))
+			throw new SpriteError(
+				`Invalid 'type' ${JSON.stringify(type)}`,
+			);
+
+		const { count, dimension, titleType } = Values[type];
+		const json = JSON.stringify(index);
+
+		index = parseInt(index, 10);
+
+		if (typeof index !== 'number' || ! Number.isFinite(index))
+			throw new SpriteTypeError(
+				`Invalid ${type} ${json}; ${type} must be a number`,
+			);
+
+		if (index < 0
+		||  (count != null && index >= count))
+			throw new SpriteOutOfBoundsError(
+				`${titleType} at ${index} does not exist`,
+			);
+
+		return (index * this.options.size[dimension]);
+	}
 	#initAnimation() {
 		this.#hasAnimation = (
 			this.options.fps > 0
@@ -346,7 +388,7 @@ export default class Sprite {
 	/** The pixel location of the current frame in the img.
 	  * @readonly
 	  * @var {number} */
-	get frameLocation() {
+	get framePx() {
 		return this.#hasAnimation
 			? this.options.frames[this.#frame] * this.options.size.width
 			: 0;
@@ -375,6 +417,35 @@ export default class Sprite {
 				? 'Image loading cancelled'
 				: `Image was not loading (readyState was '${this.readyState}'`,
 		);
+	}
+	/**
+	 * @param {number} [frame]  An animation frame index.  If no 'frames' option
+	 *   was passed to the constructor, this is the same as the image frame index.
+	 * @returns {number}  The pixel location of the requested frame in the image.
+	 */
+	getFramePx(frame) {
+		frame = this.options.frames[frame ?? this.#frame];
+
+		return this.#getPx('frame', frame);
+	}
+	/**
+	 * @param {number} [frame]  An image frame index.  If no 'frames' option was
+	 *   passed to the constructor, this is the same as the animation frame index.
+	 * @returns {number}  The pixel location of the requested frame in the image.
+	 */
+	getImageFramePx(frame) {
+		frame = frame ?? this.#frame;
+
+		return this.#getPx('frame', frame);
+	}
+	/**
+	 * @param {number} layer  An image layer index.
+	 * @returns {number}  The pixel location of the requested layer in the image.
+	 */
+	getLayerPx(layer) {
+		const layerJSON = JSON.stringify(layer);
+
+		return this.#getPx('layer', layer);
 	}
 	/**
 	 * @returns {Promise}
