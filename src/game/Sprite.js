@@ -23,7 +23,9 @@ const ReadyState = {
  * @param {Sprite~throttle} [throttle]
  */
 export default class Sprite {
-	constructor(src, options) {
+	constructor(src, options, DEBUG=false) {
+		if (typeof DEBUG === 'boolean') this.DEBUG = DEBUG;
+
 		this.#setArchivalProps(src, options);
 		this.#setOptions(options);
 		this.#initAnimation();
@@ -34,6 +36,8 @@ export default class Sprite {
 	}
 
 
+	/** @var {boolean} */
+	static DEBUG = false;
 	static ReadyState = ReadyState;
 	static get DEFAULTS() {
 		return {
@@ -256,6 +260,8 @@ export default class Sprite {
 	}
 
 
+	/** @var {boolean} */
+	DEBUG = this.constructor.DEBUG;
 	/** @var {Image} */
 	img = asyncImage();
 	/** @var {object} */
