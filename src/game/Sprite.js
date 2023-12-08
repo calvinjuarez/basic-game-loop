@@ -1,5 +1,5 @@
-export class SpriteError extends Error {};
-export class SpriteOptionError extends SpriteError {};
+export class SpriteError extends Error {}
+export class SpriteOptionError extends SpriteError {}
 
 const asyncImage = () => { const img = new Image(); img.decoding = 'async'; return img; };
 
@@ -303,7 +303,7 @@ export default class Sprite {
 	 * @param {number} stepTime
 	 */
 	update(stepTime) {
-		const { fps, frames, size, throttle } = this.options;
+		const { frames, throttle } = this.options;
 
 		if (! this.#hasAnimation) return;
 
@@ -313,7 +313,7 @@ export default class Sprite {
 		// move to the next frame and start the count over again.
 		if (this.#frameTime >= this.#frameDuration) {
 			this.#frameTime %= this.#frameDuration;
-			this.#frame = (this.#frame + 1) % this.options.frames.length;
+			this.#frame = (this.#frame + 1) % frames.length;
 		}
 	}
 }
