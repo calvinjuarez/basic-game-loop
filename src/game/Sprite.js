@@ -18,13 +18,54 @@ const ReadyState = {
 
 
 /**
+ * @typedef {object} Sprite~size
+ * @param {number|string} height
+ * 	A number (or numeric-string) or a string in format '{NUMBER}px'
+ * 	specifying the pixel length of the height of a single frame.
+ * @param {number|string} width
+ * 	A number (or numeric-string) or a string in format '{NUMBER}px'
+ * 	specifying the pixel length of the width of a single frame.
+ */
+/**
+ * @callback Sprite~throttle
+ * @param {number} stepTime
+ * @returns {number}  Modified step time to use for animation timing.
+ */
+/**
+ * @typedef {object} Sprite~options
+ * @see Constructor options for {@link Sprite}.
+ * @param {number} fps
+ * @param {?number|number[]} frames
+ * @param {boolean} lazy
+ * @param {?number|string|Sprite~size} size
+ * @param {Sprite~throttle} throttle
+ */
+
+/**
  * @param {string} src  The path to the sprite image file.
  * @param {Sprite~options} [options]
- * @param {number} [fps=0]
- * @param {?number|number[]} [frames]
+ * @param {number} [options.fps=30]
+ * 	Set to `false` or `0` to disable animation.  Passing `true` will fall back
+ * 	to the default value.
+ * @param {?number|number[]} [options.frames]
+ * 	Either the number of frames, or an array of frame indexes listing
+ * 	which frames should play in what order.
  * @param {boolean} [options.lazy=false]
- * @param {?number|string|{height:number|string,width:number|string}} [size]
- * @param {Sprite~throttle} [throttle]
+ * 	Whether to load the image during construction or wait for an
+ * 	explicit call to {@link #load}.
+ * @param {?number|string|Sprite~size} [options.size]
+ * 	A number (or numeric-string) or a string in format '{NUMBER}px'
+ * 	specifying the pixel length of the height and width of a single
+ * 	frame, or an object of 2 such values specifying the height and width
+ * 	as properties.
+ * @param {Sprite~throttle} [options.throttle=stepTime => stepTime]
+ * 	A function taking a number input representing the step time, and
+ * 	and returning a number representing by how much the frame timer
+ * 	should be increased.
+ * @param {boolean} [DEBUG=false]
+ * 	Pass to debug an instance (equivalent to setting the DEBUG property) after
+ * 	constructing.  You can also debug all instances by default by setting
+ * 	{@link Sprite.DEBUG} to `true`.
  */
 export default class Sprite {
 	constructor(src, options, DEBUG=false) {
@@ -42,45 +83,22 @@ export default class Sprite {
 	/** @var {boolean} */
 	static DEBUG = false;
 	static ReadyState = ReadyState;
+	/** @var {Sprite~options} */
 	static get DEFAULTS() {
 		return {
-			fps: 0,
+			fps: 30,
 			frames: null,
 			lazy: false,
 			size: null,
 			throttle: stepTime => stepTime,
 		};
-		/**
-		 * @callback Sprite~throttle
-		 * @param {number} stepTime
-		 * @returns {number}  Modified step time to use for animation timing.
-		 */
-		/**
-		 * @typedef {object} Sprite~options
-		 * @property {number} fps
-		 * 	The max frame rate of the sprite animation.
-		 * @property {?number|number[]} frames
-		 * 	Either the number of frames, or an array of frame indexes listing
-		 * 	which frames should play in what order.
-		 * @property {boolean} lazy
-		 * 	Whether to load the image during construction or wait for an
-		 * 	explicit call to {@link #load}.
-		 * @property {?number|string|{height:number|string,width:number|string}} size
-		 * 	Either a number or string in format '{NUMBER}' specifying the pixel
-		 * 	length of the height and width of the frame tile, or an object of 2
-		 * 	such numbers or strings specifying the height and width separately.
-		 * @property {Sprite~throttle} throttle
-		 * 	A function taking a number input representing the step time, and
-		 * 	and returning a number representing by how much the frame timer
-		 * 	should be increased.
-		 */
 	}
 
 
 	#frame = 0;
 	#frameDuration = 0;
 	#frameTime = 0;
-	#hasAnimation = false;
+	#hasAnimation = true;
 	#imgFrames = null;
 	#imgLayers = null;
 	#loadPromise = null;
@@ -129,7 +147,8 @@ export default class Sprite {
 	}
 	#initAnimation() {
 		this.#hasAnimation = (
-			this.options.fps > 0 && this.options.frames.length > 1
+			this.options.fps > 0
+			&& this.options.frames?.length > 1
 		);
 
 		if (! this.#hasAnimation) return;
