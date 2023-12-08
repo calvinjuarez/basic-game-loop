@@ -162,14 +162,11 @@ export default class Sprite {
 	#setOptions(options) {
 		if (! options) return;
 
-		try {
-			options = this.#validateOptions(options);
-		}
-		catch (err) {
-			return console.warn(`${err.name}: ${err.message}`);
-		}
+		options = this.#validateOptions(options);
 
-		Object.assign(this.options, options);
+		// Assign only the supported options
+		Object.keys(this.constructor.DEFAULTS)
+			.forEach(option => this.options[option] = options[option]);
 	}
 	#setSrc(src) {
 		if (! src || src === this.#src) return;
