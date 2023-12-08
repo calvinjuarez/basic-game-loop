@@ -1,4 +1,4 @@
-import { reactive, watchEffect } from 'vue'
+import { reactive, watchEffect } from 'vue';
 
 
 export class StoreTypeError extends TypeError {}
@@ -9,7 +9,7 @@ const store = reactive({
 	display: null,
 	displayHeight: 0,
 	displayWidth: 0,
-	facingAngle: 0,
+	facing: 0,
 	inputs: {
 		w: false,
 		a: false,
@@ -76,7 +76,7 @@ watchEffect(() => {
 
 	// see https://stackoverflow.com/questions/15994194/how-to-convert-x-y-coordinates-to-an-angle
 	if (throttle)
-		store.facingAngle = Math.atan2(throttleX, -throttleY); // -Y because canvas Y-axis increases downward as opposed to upward
+		store.facing = Math.atan2(throttleX, -throttleY); // -Y because canvas Y-axis increases downward as opposed to upward
 });
 
 

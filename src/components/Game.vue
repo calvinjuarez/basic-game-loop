@@ -76,7 +76,7 @@ function draw() {
 
 			// set rotation
 			display.translate(store.x, store.y);
-			display.rotate(store.facingAngle);
+			display.rotate(store.facing);
 			display.translate(-store.x, -store.y)
 			// draw the colorized fill
 			display.drawImage(helper.canvas, ...drawArea);
