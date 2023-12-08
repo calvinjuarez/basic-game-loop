@@ -15,10 +15,10 @@ const store = inject('store');
 let isWindowFocussed = true;
 
 const sprite = new Sprite('/img/sprite-scarab.v2.png', {
-	fps: 30,
+	fps: 16,
 	frames: [ 0, 1, 0, 2 ],
 	size: 32,
-	throttle(stepTime) { return stepTime * Math.min(store.throttle, .5); },
+	throttle(stepTime) { return stepTime * store.throttle; },
 });
 
 
