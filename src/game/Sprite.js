@@ -3,6 +3,16 @@ export class SpriteOptionError extends SpriteError {}
 
 const asyncImage = () => { const img = new Image(); img.decoding = 'async'; return img; };
 
+/** @enum {string}
+  * @memberof Sprite */
+const ReadyState = {
+	ERROR: 'error',
+	LOADING: 'loading',
+	PENDING: 'pending',
+	READY: 'ready',
+};
+
+
 /**
  * @param {string} src  The path to the sprite image file.
  * @param {Sprite~options} [options]
@@ -24,6 +34,7 @@ export default class Sprite {
 	}
 
 
+	static ReadyState = ReadyState;
 	static get DEFAULTS() {
 		return {
 			fps: 0,
@@ -64,7 +75,7 @@ export default class Sprite {
 	#frameTime = 0;
 	#hasAnimation = false;
 	#loadPromise = null;
-	#readyState = 'pending';
+	#readyState = ReadyState.PENDING;
 
 
 	#ensureLoadPromise() {
@@ -74,7 +85,7 @@ export default class Sprite {
 				this.img.onerror = reject;
 			});
 
-		this.#loadPromise.then(() => { this.#readyState = 'loaded'; });
+		this.#loadPromise.then(() => { this.#readyState = ReadyState.READY; });
 	}
 	#initAnimation() {
 		this.#hasAnimation = (
@@ -86,14 +97,14 @@ export default class Sprite {
 		this.#frameDuration = 1000 / this.options.fps;
 	}
 	#load() {
-		this.#readyState = 'loading';
 		this.#ensureLoadPromise();
 
+		this.#readyState = ReadyState.LOADING;
 		this.img.src = this.src;
 	}
 	#reset() {
 		this.#loadPromise = null;
-		this.#readyState = 'pending';
+		this.#readyState = ReadyState.PENDING;
 	}
 	#setArchivalProps(src, options) {
 		if (src)
