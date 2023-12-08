@@ -332,6 +332,14 @@ export default class Sprite {
 	/**
 	 * @returns {Promise}
 	 */
+	load() {
+		if (this.readyState !== ReadyState.PENDING) return;
+
+		this.#load();
+	}
+	/**
+	 * @returns {Promise}
+	 */
 	ready() {
 		this.#ensureLoadPromise();
 
