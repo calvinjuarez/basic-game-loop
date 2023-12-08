@@ -350,8 +350,11 @@ export default class Sprite {
 	}
 	/**
 	 * @param {number} frame  The frame index to render.
+	 * @param {object} [options]
+	 * @param {boolean} [options.end=false]
+	 *   If true, will skip to the end of the given frame instead of the start.
 	 */
-	skipToFrame(frame) {
+	skipToFrame(frame, options) {
 		frame = parseInt(frame, 10);
 
 		if (Number.isNaN(frame) || frame < 0)
@@ -359,9 +362,14 @@ export default class Sprite {
 		if (frame > this.options.frames.length)
 			throw new SpriteError(`Frame ${frame} does not exist`);
 
+		options = Object.assign({
+			// defaults
+			end: false,
+		}, options);
+
 		// set animation to the start of the given frame
 		this.#frame = frame;
-		this.#frameTime = 0;
+		this.#frameTime = options.end ? this.#frameDuration - 1 : 0;
 	}
 	/**
 	 * Method to update the animation frame based on the time elapsed since the

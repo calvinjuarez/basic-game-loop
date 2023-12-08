@@ -36,7 +36,7 @@ function update(stepTime) {
 	if (store.throttle)
 		sprite.update(stepTime);
 	else
-		sprite.skipToFrame(0);
+		sprite.skipToFrame(0, { end: true });
 }
 function draw() {
 	if (! store.display) return;
