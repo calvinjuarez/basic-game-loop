@@ -78,6 +78,8 @@ export default class Sprite {
 	#frameDuration = 0;
 	#frameTime = 0;
 	#hasAnimation = false;
+	#imgFrames = null;
+	#imgLayers = null;
 	#loadPromise = null;
 	#readyState = ReadyState.PENDING;
 
@@ -89,7 +91,13 @@ export default class Sprite {
 				this.img.onerror = reject;
 			});
 
-		this.#loadPromise.then(() => { this.#readyState = ReadyState.READY; });
+		this.#loadPromise
+			.then(() => {
+				this.#imgFrames = Math.ceil(this.img.width / this.options.size.width);
+				this.#imgLayers = Math.ceil(this.img.height / this.options.size.height);
+
+				this.#readyState = ReadyState.READY;
+			});
 	}
 	#initAnimation() {
 		this.#hasAnimation = (
