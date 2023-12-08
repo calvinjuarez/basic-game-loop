@@ -57,14 +57,14 @@ watchEffect(() => {
 
 	const { d, a, R, L } = store.inputs;
 
-	store.throttleX = (.9 * (d || R)) + (-.9 * (a || L));
+	store.throttleX = (d || R) - (a || L); // note: coerced from booleans
 });
 watchEffect(() => {
 	if (store.isPaused) return;
 
 	const { w, s, U, D } = store.inputs;
 
-	store.throttleY = (.9 * (s || D)) + (-.9 * (w || U));
+	store.throttleY = (s || D) - (w || U); // note: coerced from booleans
 });
 watchEffect(() => {
 	if (store.isPaused) return;
