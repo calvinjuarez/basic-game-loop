@@ -70,7 +70,7 @@ watchEffect(() => {
 	if (store.isPaused) return;
 
 	const { throttleX, throttleY } = store;
-	const throttle = Math.sqrt(throttleX ** 2 + throttleY ** 2)
+	const throttle = Math.min(1, Math.sqrt(throttleX ** 2 + throttleY ** 2));
 
 	store.throttle = throttle;
 
