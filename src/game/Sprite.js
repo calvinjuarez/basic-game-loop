@@ -2,6 +2,8 @@ export class SpriteError extends Error {}
 export class SpriteCancelLoadError extends SpriteError {}
 export class SpriteOptionError extends SpriteError {}
 export class SpriteOutOfBoundsError extends SpriteError {}
+export class SpriteTypeError extends TypeError {}
+export class SpriteSrcTypeError extends SpriteTypeError {}
 
 const asyncImage = () => { const img = new Image(); img.decoding = 'async'; return img; };
 
@@ -29,12 +31,11 @@ export default class Sprite {
 		if (typeof DEBUG === 'boolean') this.DEBUG = DEBUG;
 
 		this.#setArchivalProps(src, options);
+
 		this.#setOptions(options);
 		this.#initAnimation();
 
-		this.src = src;
-
-		if (! this.options.lazy) this.#load();
+		this.#setSrc(src);
 	}
 
 
@@ -85,6 +86,7 @@ export default class Sprite {
 	#loadPromise = null;
 	#loadPromiseCancel = () => {};
 	#readyState = ReadyState.PENDING;
+	#src = '';
 
 
 	#ensureLoadPromise() {
@@ -168,6 +170,22 @@ export default class Sprite {
 		}
 
 		Object.assign(this.options, options);
+	}
+	#setSrc(src) {
+		if (! src || src === this.#src) return;
+
+		if (typeof src !== 'string')
+			throw new SpriteSrcTypeError(
+				`'src' must be a string (received ${JSON.stringify(src)})`,
+			);
+
+		if (this.readyState === ReadyState.LOADING)
+			this.#loadPromiseCancel({ reason: 'src change' });
+
+		this.#readyState = ReadyState.PENDING;
+		this.#src = src;
+
+		if (this.#src && ! this.options.lazy) this.#load();
 	}
 	#validateOptions(options) {
 		const hasOption = prop => (
@@ -313,6 +331,8 @@ export default class Sprite {
 			? this.options.frames[this.#frame] * this.options.size.width
 			: 0;
 	}
+	/** @var {?string} */
+	get src() { return this.#src; }
 
 
 	/**
@@ -346,14 +366,25 @@ export default class Sprite {
 		return this.#loadPromise;
 	}
 	/**
-	 * @param {object} options
+	 * @param {Sprite~options} options
 	 * @returns {this}
+	 * @throws {SpriteOptionError} If any options are invalid.
 	 */
 	setOptions(options) {
 		if (! options) return;
 
 		this.#setOptions(options);
 		this.#initAnimation();
+
+		return this;
+	}
+	/**
+	 * @param {string} src
+	 * @returns {this}
+	 * @throws {SpriteSrcTypeError} If 'src' is not a string.
+	 */
+	setSrc(src) {
+		this.#setSrc(src);
 
 		return this;
 	}
