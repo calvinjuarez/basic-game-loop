@@ -1,6 +1,7 @@
 export class SpriteError extends Error {}
 export class SpriteCancelLoadError extends SpriteError {}
 export class SpriteOptionError extends SpriteError {}
+export class SpriteOutOfBoundsError extends SpriteError {}
 
 const asyncImage = () => { const img = new Image(); img.decoding = 'async'; return img; };
 
@@ -357,10 +358,14 @@ export default class Sprite {
 	skipToFrame(frame, options) {
 		frame = parseInt(frame, 10);
 
-		if (Number.isNaN(frame) || frame < 0)
-			throw new SpriteError(`Invalid frame ${JSON.stringify(frame)}`);
-		if (frame > this.options.frames.length)
-			throw new SpriteError(`Frame ${frame} does not exist`);
+		if (Number.isNaN(frame))
+			throw new SpriteError(
+				`Invalid frame ${JSON.stringify(frame)}`,
+			);
+		if (frame < 0 || frame > this.options.frames.length)
+			throw new SpriteOutOfBoundsError(
+				`Frame ${JSON.stringify(frame)} does not exist`,
+			);
 
 		options = Object.assign({
 			// defaults
@@ -389,5 +394,11 @@ export default class Sprite {
 			this.#frameTime %= this.#frameDuration;
 			this.#frame = (this.#frame + 1) % frames.length;
 		}
+
+		if (this.DEBUG
+		&&  this.#frame > this.options.frames.length)
+			console.warn(new SpriteOutOfBoundsError(
+				`Frame ${JSON.stringify(this.#frame)} does not exist`,
+			).message);
 	}
 }
