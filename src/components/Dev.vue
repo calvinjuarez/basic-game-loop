@@ -63,6 +63,8 @@ const xy = computed(() => `(${Math.round(store.x)}, ${Math.round(store.y)})`);
 			<dl class="dl-cols  ms-2 mb-0">
 				<dt>position (x, y):</dt>
 				<dd><output>{{ xy }}</output></dd>
+				<dt>throttle:</dt>
+				<dd><output>{{ store.throttle }}</output></dd>
 				<dt>inputs:</dt>
 				<dd><output>{{ inputs }}</output></dd>
 				<dt>avatar style:</dt>

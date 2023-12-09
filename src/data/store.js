@@ -1,4 +1,4 @@
-import { reactive, watchEffect } from 'vue'
+import { reactive, watchEffect } from 'vue';
 
 
 export class StoreTypeError extends TypeError {}
@@ -9,7 +9,7 @@ const store = reactive({
 	display: null,
 	displayHeight: 0,
 	displayWidth: 0,
-	facingAngle: 0,
+	facing: 0,
 	inputs: {
 		w: false,
 		a: false,
@@ -57,26 +57,26 @@ watchEffect(() => {
 
 	const { d, a, R, L } = store.inputs;
 
-	store.throttleX = (.9 * (d || R)) + (-.9 * (a || L));
+	store.throttleX = (d || R) - (a || L); // note: coerced from booleans
 });
 watchEffect(() => {
 	if (store.isPaused) return;
 
 	const { w, s, U, D } = store.inputs;
 
-	store.throttleY = (.9 * (s || D)) + (-.9 * (w || U));
+	store.throttleY = (s || D) - (w || U); // note: coerced from booleans
 });
 watchEffect(() => {
 	if (store.isPaused) return;
 
 	const { throttleX, throttleY } = store;
-	const throttle = Math.sqrt(throttleX ** 2 + throttleY ** 2)
+	const throttle = Math.min(1, Math.sqrt(throttleX ** 2 + throttleY ** 2));
 
 	store.throttle = throttle;
 
 	// see https://stackoverflow.com/questions/15994194/how-to-convert-x-y-coordinates-to-an-angle
 	if (throttle)
-		store.facingAngle = Math.atan2(throttleX, -throttleY); // -Y because canvas Y-axis increases downward as opposed to upward
+		store.facing = Math.atan2(throttleX, -throttleY); // -Y because canvas Y-axis increases downward as opposed to upward
 });
 
 
