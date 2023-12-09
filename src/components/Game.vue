@@ -1,39 +1,16 @@
 <script setup>
-import {
-	computed,
-	inject,
-	onBeforeUnmount,
-	onMounted,
-	ref,
-	watchEffect,
-} from 'vue';
+import { inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 import { clamp } from '@/util/number.js';
 
 import Settings from '@/components/Settings.vue';
-import Joystick from '@/components/Joystick.vue';
+import Controls from '@/components/Controls.vue';
 
 import Clock from '@/game/Clock.js';
 import Sprite from '@/game/Sprite.js';
 
 
 const store = inject('store');
-
-const inputs = computed(() => JSON.stringify(
-	Object.keys(store.inputs).filter(key => store.inputs[key]), null, 1,
-).replace(/["\n]/g, '').replace(/\]/, ' ]'));
-const displaySize = computed(() => (store.display
-	? `${store.display.canvas.offsetWidth}x${store.display.canvas.offsetHeight}`
-	: 'none'
-));
-const displayPxSize = computed(() => (store.display
-	? `${store.displayWidth}x${store.displayHeight}`
-	: 'none'
-));
-const fps = ref('');
-
-const isDevHidden = ref(false);
-const isPaused = ref(false);
 
 let isWindowFocussed = true;
 
@@ -124,7 +101,7 @@ function draw() {
 	}
 
 
-	if (isPaused.value) {
+	if (store.isPaused) {
 		const barWidth = 50;
 		const barHeight = 150;
 		const x = (displayWidth - barWidth) / 2;
@@ -138,25 +115,25 @@ function draw() {
 }
 
 
-// pausing blocks updates from the clock, so to note that we've paused, we call
-// draw() one more time when the `isPaused` value changes to `true`.
-watchEffect(() => isPaused.value && draw());
-
-
 const clock = new Clock(stepTime => {
-	if (isPaused.value || ! isWindowFocussed) return;
+	if (store.isPaused || ! isWindowFocussed) return;
 
 	update(stepTime);
 	draw();
 }, {
 	doMeasureFPS: true,
-	onFPSChange(_fps) { fps.value = `~${_fps}fps`; },
+	onFPSChange(fps) { store.dev.fps = `~${fps}fps`; },
 });
 
 clock.start();
 
 
 window.$game = { clock, store, sprite };
+
+
+// pausing blocks updates from the clock, so to note that we've paused, we call
+// draw() one more time when the `isPaused` value changes to `true`.
+watch(() => store.isPaused, () => store.isPaused && draw());
 
 
 onMounted(() => {
@@ -188,54 +165,8 @@ onBeforeUnmount(() => {
 			width="1600"
 			height="900"
 		></canvas>
-		<Joystick/>
-		<Settings/>
-		<aside class="game-dev-tools">
-			<h5>Dev Tools</h5>
-			<div class="game-dev-tools-bar">
-				<button
-					type="button"
-					class="btn btn-outline-secondary"
-					@click="isPaused = ! isPaused"
-				>&#9199;</button>
-				<button
-					type="button"
-					class="btn btn-outline-secondary"
-					@click="isDevHidden = ! isDevHidden"
-				>Toggle Dev Info</button>
-				<button
-					type="button"
-					class="btn btn-outline-secondary"
-					@click="store.avatarStyle = (store.avatarStyle === 'bug') ? 'box' : 'bug'"
-				>Switch to {{ (store.avatarStyle === 'bug') ? 'Box' : 'Bug' }}</button>
-			</div>
-		</aside>
-		<aside class="game-dev-info" v-if="! isDevHidden">
-			<h5>Dev Info</h5>
-			<h6>Performance</h6>
-			<dl class="dl-cols">
-				<dt>fps:</dt>
-				<dd><output>{{ fps }}</output></dd>
-			</dl>
-			<h6>Display</h6>
-			<dl class="dl-cols">
-				<dt>pixel dimensions:</dt>
-				<dd><output>{{ displayPxSize }}</output></dd>
-				<dt>dimensions on screen:</dt>
-				<dd><output>{{ displaySize }}</output></dd>
-				<dt>avatar color:</dt>
-				<dd><output>{{ store.color }}</output></dd>
-			</dl>
-			<h6>Game</h6>
-			<dl class="dl-cols">
-				<dt>(x, y):</dt>
-				<dd><output>{{ `(${Math.round(store.x)}, ${Math.round(store.y)})` }}</output></dd>
-				<dt>avatarStyle:</dt>
-				<dd><output>{{ store.avatarStyle }}</output></dd>
-				<dt>inputs:</dt>
-				<dd><output>{{ inputs }}</output></dd>
-			</dl>
-		</aside>
+		<Controls class="game-controls"/>
+		<Settings class="game-settings"/>
 	</div>
 </template>
 
@@ -243,22 +174,26 @@ onBeforeUnmount(() => {
 
 <style>
 .game {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: start;
+	display: grid;
 	gap: var(--spacer-2);
+	grid-template-columns: auto 200px;
+
+	@media only screen and (min-width: 576px) {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: start;
+	}
 }
 .game-display {
+	grid-column-start: span 2;
 	outline: 1px solid #b9b9b9; /* don't wanna add space to the box model */
 	width: 100%;
 	max-width: 400px;
 }
-.game-dev-info {}
-.game-dev-tools {
-	width: 100%;
-}
-	.game-dev-tools-bar {
-		display: flex;
-		gap: 0 var(--spacer-1);
+.game-controls {
+	@media only screen and (max-width: 575px) {
+		order: 1;
 	}
+}
+.game-settings {}
 </style>

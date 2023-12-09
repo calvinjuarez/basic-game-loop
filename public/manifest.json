@@ -1,0 +1,55 @@
+{
+	"name": "Browser Game",
+	"start_url": "/",
+	"theme_color": "#face75",
+	"background_color": "#ffffff",
+	"display": "standalone",
+	"icons": [
+		{
+			"src": "/favicon.ico",
+			"type": "image/png",
+			"sizes": "16x16 32x32",
+			"purpose": "maskable"
+		},
+		{
+			"src": "/icon128.png",
+			"type": "image/png",
+			"sizes": "64x64 128x128",
+			"purpose": "maskable"
+		},
+		{
+			"src": "/icon192.png",
+			"type": "image/png",
+			"sizes": "48x48 96x96 192x192",
+			"purpose": "maskable"
+		},
+		{
+			"src": "/icon384.png",
+			"type": "image/png",
+			"sizes": "192x192 384x384",
+			"purpose": "maskable"
+		},
+		{
+			"src": "/icon512.png",
+			"type": "image/png",
+			"sizes": "any",
+			"purpose": "maskable"
+		},
+		{
+			"src": "/icon512.png",
+			"type": "image/png",
+			"sizes": "any"
+		},
+		{
+			"src": "/icon1024.png",
+			"type": "image/png",
+			"sizes": "any",
+			"purpose": "maskable"
+		},
+		{
+			"src": "/icon1024.png",
+			"type": "image/png",
+			"sizes": "any"
+		}
+	]
+}
