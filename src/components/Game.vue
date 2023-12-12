@@ -18,22 +18,36 @@ const sprite = new Sprite('/img/sprite-scarab.v2.png', {
 	fps: 16,
 	frames: [ 0, 1, 0, 2 ],
 	size: 32,
-	throttle(stepTime) { return stepTime * store.throttle; },
+	throttle(stepTime) { return stepTime * store.speed; },
+});
+const hitbox = Object.freeze({
+	__proto__: null,
+	get rX() { return sprite.size.width / 2; },
+	get rY() { return sprite.size.height / 2; },
 });
 
 
 function update(stepTime) {
 	if (! store.displayWidth || ! store.displayHeight) return;
 
-	const newX = stepTime * store.sensitivity * store.throttleX + store.x;
-	const newY = stepTime * store.sensitivity * store.throttleY + store.y;
+	const {
+		displayHeight,
+		displayWidth,
+		sensitivity,
+		speed,
+		speedX,
+		speedY,
+	} = store;
 
-	const { width, height } = sprite.size;
+	const dX = stepTime * sensitivity * speedX;
+	const dY = stepTime * sensitivity * speedY;
 
-	store.x = clamp(newX, width / 2, store.displayWidth - width / 2);
-	store.y = clamp(newY, height / 2, store.displayHeight - height / 2);
+	const { rX, rY } = hitbox;
 
-	if (store.throttle)
+	store.x = clamp(store.x + dX, rX, displayWidth - rX);
+	store.y = clamp(store.y + dY, rY, displayHeight - rY);
+
+	if (speed)
 		sprite.update(stepTime);
 	else
 		sprite.skipToFrame(0, { end: true });
@@ -120,7 +134,7 @@ const clock = new Clock(stepTime => {
 clock.start();
 
 
-window.$game = { clock, store, sprite };
+window.$game = { clock, store, sprite, hitbox };
 
 
 // pausing blocks updates from the clock, so to note that we've paused, we call
