@@ -37,6 +37,8 @@ const store = reactive({
 	)),
 	/** @readonly */
 	facing: computed(() => facing.value),
+	/** @readonly */
+	hasInput: computed(() => Object.values(store.inputs).some(value => value)),
 	inputs: {
 		w: false,
 		a: false,
