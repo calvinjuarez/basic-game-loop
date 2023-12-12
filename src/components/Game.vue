@@ -128,7 +128,7 @@ const clock = new Clock(stepTime => {
 	draw();
 }, {
 	doMeasureFPS: true,
-	onFPSChange(fps) { store.dev.fps = `~${fps}fps`; },
+	onFPSChange(fps) { store.dev.fps = fps; },
 });
 
 clock.start();

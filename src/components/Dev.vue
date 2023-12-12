@@ -48,7 +48,7 @@ const deci = n => n.toPrecision(5).slice(0, 6);
 			<h6>Performance</h6>
 			<dl class="dl-cols  ms-2 mb-0">
 				<dt>fps:</dt>
-				<dd><output>{{ store.dev.fps }}</output></dd>
+				<dd><output>~{{ store.dev.fps }}</output></dd>
 			</dl>
 			<h6>Display</h6>
 			<dl class="dl-cols  ms-2 mb-0">

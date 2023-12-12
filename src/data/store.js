@@ -62,7 +62,7 @@ const store = reactive({
 	y: 0,
 
 	dev: {
-		fps: '0',
+		fps: 0,
 	},
 
 	setDisplay(canvas) {
