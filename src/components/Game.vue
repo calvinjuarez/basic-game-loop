@@ -146,7 +146,7 @@ onMounted(() => {
 	window.addEventListener('blur', () => isWindowFocussed = false);
 	window.addEventListener('focus', () => isWindowFocussed = true);
 
-	store.setDisplay(document.getElementById('game-display'));
+	store.displayTo(document.getElementById('game-display'));
 
 	store.x = store.displayWidth / 2;
 	store.y = store.displayHeight / 2;
@@ -157,10 +157,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
 	delete window.$game;
 
-	store.unsetDisplay();
-
-	store.x = 0;
-	store.y = 0;
+	store.reset();
 });
 </script>
 

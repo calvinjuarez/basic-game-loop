@@ -65,15 +65,26 @@ const store = reactive({
 		fps: 0,
 	},
 
-	setDisplay(canvas) {
-		if (! canvas instanceof HTMLCanvasElement)
-			throw new StoreTypeError(`setDisplay() requires 'canvas' to be an
+	// PUBLIC METHODS
+	/**
+	 * Create a `CanvasRenderingContext2D` from the given canvas and set it as
+	 * the display.
+	 * @param {HTMLCanvasElement} canvas  The canvas on which to display the game.
+	 * @throws {StoreTypeError} If `canvas` is NOT an HTMLCanvasElement instance.
+	 */
+	displayTo(canvas) {
+		if (! (canvas instanceof HTMLCanvasElement))
+			throw new StoreTypeError(`displayTo() requires 'canvas' to be an
 				HTMLCanvasElement instance.`);
 
 		this.display = canvas.getContext('2d');
 	},
-	unsetDisplay() {
+	/**
+	 * Detach game from its display and set movement vars to 0.
+	 */
+	reset() {
 		this.display = null;
+		facing.value = this.throttleX = this.throttleY = this.x = this.y = 0;
 	},
 });
 
