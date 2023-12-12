@@ -52,26 +52,29 @@ const deci = n => n.toPrecision(5).slice(0, 6);
 			</dl>
 			<h6>Display</h6>
 			<dl class="dl-cols  ms-2 mb-0">
-				<dt>pixel dimensions:</dt>
-				<dd><output>{{ displayPxSize }}</output></dd>
-				<dt>dimensions on screen:</dt>
-				<dd><output>{{ displaySize }}</output></dd>
 				<dt>avatar color:</dt>
 				<dd><output>
 					{{ store.color }}
 					<span class="dev-info-swatch" :style="`--swatch:${store.color};`"></span>
 				</output></dd>
+				<dt>dimensions (pixels):</dt>
+				<dd><output>{{ displayPxSize }}</output></dd>
+				<dt>dimensions (screen):</dt>
+				<dd><output>{{ displaySize }}</output></dd>
 			</dl>
 			<h6>Game</h6>
 			<dl class="dl-cols  ms-2 mb-0">
-				<dt>position (x, y):</dt>
-				<dd><output>({{ Math.round(store.x) }}, {{ Math.round(store.y) }})</output></dd>
-				<dt>throttle (x, y):</dt>
-				<dd><output>({{ deci(store.throttleX) }}, {{ deci(store.throttleY) }})</output></dd>
-				<dt>inputs:</dt>
-				<dd><output>{{ inputs }}</output></dd>
 				<dt>avatar style:</dt>
 				<dd><output>{{ store.avatarStyle }}</output></dd>
+				<dt>inputs:</dt>
+				<dd><output>{{ inputs }}</output></dd>
+				<dt>position:</dt>
+				<dd><output>(x: {{ Math.round(store.x) }}, y: {{ Math.round(store.y) }})</output></dd>
+				<dt>speed:</dt>
+				<dd><output>{{ deci(store.speed) }}</output></dd>
+				<dd><output>(x:{{ deci(store.speedX) }}, y:{{ deci(store.speedY) }})</output></dd>
+				<dt>throttle:</dt>
+				<dd><output>(x:{{ deci(store.throttleX) }}, y:{{ deci(store.throttleY) }})</output></dd>
 			</dl>
 		</aside>
 	</div>
