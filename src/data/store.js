@@ -1,14 +1,25 @@
-import { reactive, watchEffect } from 'vue';
+/** @module */
+import { computed, reactive, ref, watchEffect } from 'vue';
 
 
 export class StoreTypeError extends TypeError {}
 
 const store = reactive({
+	// PUBLIC PROPERTIES
 	avatarStyle: window.localStorage.getItem('avatar') || 'bug',
 	color: window.localStorage.getItem('color') || '#55aadd',
+	/** @var {?CanvasRenderingContext2D} */
 	display: null,
-	displayHeight: 0,
-	displayWidth: 0,
+	/** @readonly */
+	displayHeight: computed(() => (
+		(store.display instanceof CanvasRenderingContext2D)
+			? store.display.canvas.height : 0
+	)),
+	/** @readonly */
+	displayWidth: computed(() => (
+		(store.display instanceof CanvasRenderingContext2D)
+			? store.display.canvas.width : 0
+	)),
 	facing: 0,
 	inputs: {
 		w: false,
@@ -36,16 +47,12 @@ const store = reactive({
 	setDisplay(canvas) {
 		if (! canvas instanceof HTMLCanvasElement)
 			throw new StoreTypeError(`setDisplay() requires 'canvas' to be an
-				HTMLCanvasElement instance.`)
+				HTMLCanvasElement instance.`);
 
 		this.display = canvas.getContext('2d');
-		this.displayWidth = canvas.width;
-		this.displayHeight = canvas.height;
 	},
 	unsetDisplay() {
 		this.display = null;
-		this.displayHeight = 0;
-		this.displayWidth = 0;
 	},
 });
 
