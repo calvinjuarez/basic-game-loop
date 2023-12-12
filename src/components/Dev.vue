@@ -17,7 +17,11 @@ const inputs = computed(() => JSON.stringify(
 	Object.keys(store.inputs).filter(key => store.inputs[key]), null, 1,
 ).replace(/["\n]/g, '').replace(/\]/, ' ]').toUpperCase());
 const isDevHidden = ref(false);
-const deci = n => n.toPrecision(5).slice(0, 6);
+const deci = n => (
+	(n === -0)
+		? ' 0.000'
+		: ((n >= 0 ? ' ' : '') + (+n).toPrecision(4)).slice(0, 6)
+);
 </script>
 
 
