@@ -9,7 +9,14 @@ export class StoreTypeError extends TypeError {}
 const throttle = computed(() => (
 	store.isPaused ? 0 : Math.sqrt(store.throttleX ** 2 + store.throttleY ** 2)
 ));
+const normalFactor = computed(() => (
+	(store.isPaused || throttle.value <= 1) ? 1 : (1 / throttle.value)
+));
 const facing = ref(0);
+
+
+// PRIVATE METHODS
+const normalize = n => n * normalFactor.value;
 
 
 const store = reactive({
@@ -42,6 +49,12 @@ const store = reactive({
 	},
 	isPaused: false,
 	sensitivity: 1,
+	/** @readonly */
+	speed: computed(() => normalize(throttle.value)),
+	/** @readonly */
+	speedX: computed(() => normalize(store.throttleX)),
+	/** @readonly */
+	speedY: computed(() => normalize(store.throttleY)),
 	throttleX: 0,
 	throttleY: 0,
 	title: 'Browser Game',
