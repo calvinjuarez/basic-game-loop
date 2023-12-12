@@ -44,10 +44,6 @@ const store = reactive({
 		a: false,
 		s: false,
 		d: false,
-		R: false,
-		L: false,
-		U: false,
-		D: false,
 	},
 	isPaused: false,
 	sensitivity: 1,
@@ -98,14 +94,14 @@ watchEffect(() => {
 
 	const { d, a, R, L } = store.inputs;
 
-	store.throttleX = (d || R) - (a || L); // note: coerced from booleans
+	store.throttleX = d - a; // note: coerced from booleans
 });
 watchEffect(() => {
 	if (store.isPaused) return;
 
 	const { w, s, U, D } = store.inputs;
 
-	store.throttleY = (s || D) - (w || U); // note: coerced from booleans
+	store.throttleY = s - w; // note: coerced from booleans
 });
 watchEffect(() => {
 	if (store.isPaused) return;

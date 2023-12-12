@@ -6,10 +6,7 @@ import Joystick from '@/components/Joystick.vue';
 
 const store = inject('store');
 
-const Key = {
-	39: 'R', 37: 'L', 38: 'U', 40: 'D', // arrow keys
-	87: 'w', 65: 'a', 83: 's', 68: 'd', // WASD
-};
+const Key = { 87: 'w', 65: 'a', 83: 's', 68: 'd' };
 const KEYS = Object.keys(Key).map(key => +key);
 
 
