@@ -4,6 +4,14 @@ import { computed, reactive, ref, watchEffect } from 'vue';
 
 export class StoreTypeError extends TypeError {}
 
+
+// PRIVATE PROPERTIES
+const throttle = computed(() => (
+	store.isPaused ? 0 : Math.sqrt(store.throttleX ** 2 + store.throttleY ** 2)
+));
+const facing = ref(0);
+
+
 const store = reactive({
 	// PUBLIC PROPERTIES
 	avatarStyle: window.localStorage.getItem('avatar') || 'bug',
@@ -20,7 +28,8 @@ const store = reactive({
 		(store.display instanceof CanvasRenderingContext2D)
 			? store.display.canvas.width : 0
 	)),
-	facing: 0,
+	/** @readonly */
+	facing: computed(() => facing.value),
 	inputs: {
 		w: false,
 		a: false,
@@ -35,7 +44,6 @@ const store = reactive({
 	sensitivity: 1,
 	throttleX: 0,
 	throttleY: 0,
-	throttle: 0,
 	title: 'Browser Game',
 	x: 0,
 	y: 0,
@@ -75,15 +83,10 @@ watchEffect(() => {
 });
 watchEffect(() => {
 	if (store.isPaused) return;
-
-	const { throttleX, throttleY } = store;
-	const throttle = Math.min(1, Math.sqrt(throttleX ** 2 + throttleY ** 2));
-
-	store.throttle = throttle;
+	if (! throttle.value) return;
 
 	// see https://stackoverflow.com/questions/15994194/how-to-convert-x-y-coordinates-to-an-angle
-	if (throttle)
-		store.facing = Math.atan2(throttleX, -throttleY); // -Y because canvas Y-axis increases downward as opposed to upward
+	facing.value = Math.atan2(store.throttleX, -store.throttleY); // -Y because canvas Y-axis increases downward as opposed to upward
 });
 
 
