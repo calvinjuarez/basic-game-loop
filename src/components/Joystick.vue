@@ -1,8 +1,6 @@
 <script setup>
 import { computed, inject, reactive, ref } from 'vue';
 
-import { clamp } from '@/util/number.js';
-
 
 const store = inject('store');
 
@@ -31,8 +29,8 @@ function controlStart(e) {
 function controlMove(e) {
 	if (! controlling.value) return;
 
-	store.throttleX = clamp(e.x - pointerX, -100, 100) / 100;
-	store.throttleY = clamp(e.y - pointerY, -100, 100) / 100;
+	store.throttleX = (e.x - pointerX) / 100;
+	store.throttleY = (e.y - pointerY) / 100;
 
 	// #sanitycheck: end control if we lose pointer capture (which somehow
 	// happens sometimes, though I'm not sure why.
