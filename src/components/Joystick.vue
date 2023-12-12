@@ -15,8 +15,8 @@ let pointerY = 0;
 
 
 const position = computed(() => ({
-	x: store.throttleX * 100,
-	y: store.throttleY * 100,
+	x: store.speedX * 100,
+	y: store.speedY * 100,
 }));
 
 
@@ -76,12 +76,11 @@ function controlEnd(e) {
 			@mousedown.stop.prevent
 			@mousemove.stop.prevent
 		>
-			<rect
+			<circle
 				class="joystick-boundary"
-				height="200"
-				width="200"
-				x="-100"
-				y="-100"
+				cx="0"
+				cy="0"
+				r="100"
 			/>
 			<circle
 				class="joystick-handle"
