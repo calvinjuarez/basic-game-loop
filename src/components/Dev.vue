@@ -16,7 +16,7 @@ const inputs = computed(() => JSON.stringify(
 	Object.keys(store.inputs).filter(key => store.inputs[key]), null, 1,
 ).replace(/["\n]/g, '').replace(/\]/, ' ]'));
 const isDevHidden = ref(false);
-const xy = computed(() => `(${Math.round(store.x)}, ${Math.round(store.y)})`);
+const deci = n => n.toPrecision(5).slice(0, 6);
 </script>
 
 
@@ -62,9 +62,9 @@ const xy = computed(() => `(${Math.round(store.x)}, ${Math.round(store.y)})`);
 			<h6>Game</h6>
 			<dl class="dl-cols  ms-2 mb-0">
 				<dt>position (x, y):</dt>
-				<dd><output>{{ xy }}</output></dd>
-				<dt>throttle:</dt>
-				<dd><output>{{ store.throttle }}</output></dd>
+				<dd><output>({{ Math.round(store.x) }}, {{ Math.round(store.y) }})</output></dd>
+				<dt>throttle (x, y):</dt>
+				<dd><output>({{ deci(store.throttleX) }}, {{ deci(store.throttleY) }})</output></dd>
 				<dt>inputs:</dt>
 				<dd><output>{{ inputs }}</output></dd>
 				<dt>avatar style:</dt>
