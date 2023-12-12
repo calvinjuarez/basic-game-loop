@@ -57,7 +57,10 @@ const deci = n => n.toPrecision(5).slice(0, 6);
 				<dt>dimensions on screen:</dt>
 				<dd><output>{{ displaySize }}</output></dd>
 				<dt>avatar color:</dt>
-				<dd><output>{{ store.color }}</output></dd>
+				<dd><output>
+					{{ store.color }}
+					<span class="dev-info-swatch" :style="`--swatch:${store.color};`"></span>
+				</output></dd>
 			</dl>
 			<h6>Game</h6>
 			<dl class="dl-cols  ms-2 mb-0">
@@ -77,10 +80,19 @@ const deci = n => n.toPrecision(5).slice(0, 6);
 
 
 <style>
-/*.dev-section*/.dev-info {}
+.dev output {
+	font-family: var(--bs-font-monospace, monospace);
+}
 /*.dev-section*/.dev-tools {}
 	.dev-tools-bar {
 		display: flex;
 		gap: 0 var(--spacer-1);
+	}
+/*.dev-section*/.dev-info {}
+	.dev-info-swatch {
+		display: inline-block;
+		height: 1rem;
+		width: 1rem;
+		background-color: var(--swatch, #000000);
 	}
 </style>
