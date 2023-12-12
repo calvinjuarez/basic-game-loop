@@ -1,5 +1,5 @@
 <script setup>
-import { inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 import { clamp } from '@/util/number.js';
 
@@ -13,6 +13,7 @@ import Sprite from '@/game/Sprite.js';
 const store = inject('store');
 
 let isWindowFocussed = true;
+const SCALE = computed(() => (store.avatarStyle === 'bug') ? 4 : 1);
 
 const sprite = new Sprite('/img/sprite-scarab.v2.png', {
 	fps: 16,
@@ -22,8 +23,8 @@ const sprite = new Sprite('/img/sprite-scarab.v2.png', {
 });
 const hitbox = Object.freeze({
 	__proto__: null,
-	get rX() { return sprite.size.width / 2; },
-	get rY() { return sprite.size.height / 2; },
+	get rX() { return SCALE.value * sprite.size.width / 2; },
+	get rY() { return SCALE.value * sprite.size.height / 2; },
 });
 
 
@@ -68,15 +69,14 @@ function draw() {
 		}
 		case 'bug': {
 			// see https://spicyyoghurt.com/tutorials/html5-javascript-game-development/images-and-sprite-animations
-			const SCALE = 4;
 			const FRAME = sprite.framePx;
 			const OUTLINE = sprite.getLayerPx(0);
 			const FILL = sprite.getLayerPx(1);
 			const drawArea = [
-				store.x - (SCALE * width / 2),
-				store.y - (SCALE * height / 2),
-				SCALE * width,
-				SCALE * height,
+				store.x - (SCALE.value * width / 2),
+				store.y - (SCALE.value * height / 2),
+				SCALE.value * width,
+				SCALE.value * height,
 			];
 
 			const helper = document.createElement('canvas').getContext('2d');
