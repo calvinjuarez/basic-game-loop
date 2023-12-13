@@ -100,7 +100,12 @@ function controlEnd(e) {
 	opacity: .5;
 }
 .joystick-handle {
+	cursor: grab;
 	fill: var(--bs-gray-600);
 	opacity: .5;
+
+	&:active {
+		cursor: grabbing;
+	}
 }
 </style>
