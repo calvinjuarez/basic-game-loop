@@ -10,6 +10,18 @@ const Key = { 87: 'w', 65: 'a', 83: 's', 68: 'd', 16: 'shift' };
 const KEYS = Object.keys(Key).map(key => +key);
 
 
+function update(stepTime) {
+	if (store.supports.gamepads)
+		store.gamepads = [ ...navigator.getGamepads().filter(x => x) ];
+
+	if (wizard.gamepad) {
+		pressed.value = wizard.gamepad.buttons.filter(button => button.pressed);
+
+
+	}
+}
+
+
 const _onKeyDown = e => {
 	if (store.input.hasKey)
 		e.preventDefault();
@@ -42,6 +54,11 @@ onBeforeUnmount(() => {
 	window.removeEventListener('keydown', _onKeyDown, false);
 	window.removeEventListener('keyup', _onKeyUp, false);
 	window.removeEventListener('beforeunload', _onBeforeUnload);
+});
+
+
+defineExpose({
+	update,
 });
 </script>
 
