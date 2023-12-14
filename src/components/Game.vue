@@ -52,6 +52,9 @@ function update(stepTime) {
 		sprite.update(stepTime);
 	else
 		sprite.skipToFrame(0, { end: true });
+
+	if (store.supports.gamepads)
+		store.gamepads = [ ...navigator.getGamepads() ];
 }
 function draw() {
 	if (! store.display) return;
@@ -157,7 +160,6 @@ onMounted(() => {
 
 	draw();
 });
-
 onBeforeUnmount(() => {
 	window.removeEventListener('blur', _onBlur);
 	window.removeEventListener('focus', _onFocus);

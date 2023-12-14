@@ -53,7 +53,7 @@ const store = reactive({
 	)),
 	/** @readonly */
 	facing: computed(() => facing.value),
-	/** @readonly */
+	gamepads: [],
 	input: {
 		hasAny: computed(() => store.input.hasKey || store.input.hasVirtual),
 		hasKey: computed(() => any(store.input.key, 'wasd'.split(''))),
@@ -81,6 +81,10 @@ const store = reactive({
 	speedX: computed(() => normalize(store.throttleX)),
 	/** @readonly */
 	speedY: computed(() => normalize(store.throttleY)),
+	supports: {
+		gamepads: typeof navigator?.getGamepads === 'function',
+		gamepadEvents: ('ongamepadconnected' in window),
+	},
 	throttleX: 0,
 	throttleY: 0,
 	title: 'Browser Game',
