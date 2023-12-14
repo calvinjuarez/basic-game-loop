@@ -12,8 +12,10 @@ import Sprite from '@/game/Sprite.js';
 
 const store = inject('store');
 
-let isWindowFocussed = true;
+const $controls = ref(null);
 const SCALE = computed(() => (store.avatarStyle === 'bug') ? 4 : 1);
+
+let isWindowFocussed = true;
 
 const sprite = new Sprite('/img/sprite-scarab.v2.png', {
 	fps: 16,
@@ -53,8 +55,7 @@ function update(stepTime) {
 	else
 		sprite.skipToFrame(0, { end: true });
 
-	if (store.supports.gamepads)
-		store.gamepads = [ ...navigator.getGamepads() ];
+	$controls.value.update(stepTime);
 }
 function draw() {
 	if (! store.display) return;
@@ -180,7 +181,7 @@ onBeforeUnmount(() => {
 			width="1600"
 			height="900"
 		></canvas>
-		<Controls class="game-controls"/>
+		<Controls class="game-controls" ref="$controls"/>
 		<Settings class="game-settings"/>
 	</div>
 </template>
