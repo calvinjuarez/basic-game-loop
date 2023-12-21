@@ -1,8 +1,6 @@
 <script setup>
 import { computed, inject, reactive, ref } from 'vue';
 
-import { clamp } from '@/util/number.js';
-
 
 const store = inject('store');
 
@@ -15,8 +13,8 @@ let pointerY = 0;
 
 
 const position = computed(() => ({
-	x: store.throttleX * 100,
-	y: store.throttleY * 100,
+	x: store.speedX * 100,
+	y: store.speedY * 100,
 }));
 
 
@@ -31,8 +29,8 @@ function controlStart(e) {
 function controlMove(e) {
 	if (! controlling.value) return;
 
-	store.throttleX = clamp(e.x - pointerX, -100, 100) / 100;
-	store.throttleY = clamp(e.y - pointerY, -100, 100) / 100;
+	store.throttleX = (e.x - pointerX) / 100;
+	store.throttleY = (e.y - pointerY) / 100;
 
 	// #sanitycheck: end control if we lose pointer capture (which somehow
 	// happens sometimes, though I'm not sure why.
@@ -76,12 +74,11 @@ function controlEnd(e) {
 			@mousedown.stop.prevent
 			@mousemove.stop.prevent
 		>
-			<rect
+			<circle
 				class="joystick-boundary"
-				height="200"
-				width="200"
-				x="-100"
-				y="-100"
+				cx="0"
+				cy="0"
+				r="100"
 			/>
 			<circle
 				class="joystick-handle"
@@ -103,7 +100,12 @@ function controlEnd(e) {
 	opacity: .5;
 }
 .joystick-handle {
+	cursor: grab;
 	fill: var(--bs-gray-600);
 	opacity: .5;
+
+	&:active {
+		cursor: grabbing;
+	}
 }
 </style>
