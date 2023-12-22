@@ -4,6 +4,13 @@ import { computed, reactive, ref, watchEffect } from 'vue';
 
 export class StoreTypeError extends TypeError {}
 
+export const ControlType = Object.freeze({
+	KEYS: 'KEYS',
+	NONE: 'NONE',
+	VIRTUAL: 'VIRTUAL',
+	__proto__: null,
+});
+
 
 // PRIVATE PROPERTIES
 const throttle = computed(() => (
@@ -27,6 +34,7 @@ const store = reactive({
 	// PUBLIC PROPERTIES
 	avatarStyle: window.localStorage.getItem('avatar') || 'bug',
 	color: window.localStorage.getItem('color') || '#55aadd',
+	controlType: ControlType.NONE,
 	/** @var {?CanvasRenderingContext2D} */
 	display: null,
 	/** @readonly */
@@ -121,6 +129,16 @@ watchEffect(() => {
 
 	// see https://stackoverflow.com/questions/15994194/how-to-convert-x-y-coordinates-to-an-angle
 	facing.value = Math.atan2(store.throttleX, -store.throttleY); // -Y because canvas Y-axis increases downward as opposed to upward
+});
+watchEffect(() => {
+	if (! store.input.hasAny)
+		return store.controlType = ControlType.NONE;
+
+	if (store.input.hasVirtual)
+		return store.controlType = ControlType.VIRTUAL;
+
+	if (store.input.hasKey)
+		return store.controlType = ControlType.KEYS;
 });
 
 
