@@ -4,25 +4,41 @@ import { computed, reactive, ref, watchEffect } from 'vue';
 
 export class StoreTypeError extends TypeError {}
 
+export const ControlType = Object.freeze({
+	KEYS: 'KEYS',
+	NONE: 'NONE',
+	VIRTUAL: 'VIRTUAL',
+	__proto__: null,
+});
+
 
 // PRIVATE PROPERTIES
 const throttle = computed(() => (
 	store.isPaused ? 0 : Math.sqrt(store.throttleX ** 2 + store.throttleY ** 2)
 ));
 const normalFactor = computed(() => (
-	(store.isPaused || throttle.value <= 1) ? 1 : (1 / throttle.value)
+	(
+		(store.isPaused || throttle.value <= 1) ? 1 : (1 / throttle.value)
+	) * (
+		store.slow ? .4 : 1
+	)
 ));
 const facing = ref(0);
 
 
 // PRIVATE METHODS
 const normalize = n => n * normalFactor.value;
+const any = (hash, keys) => Array.isArray(keys)
+	? keys.some(key => Object.hasOwn(hash, key) && hash[key])
+	: Object.values(hash).some(value => value);
+
 
 
 const store = reactive({
 	// PUBLIC PROPERTIES
 	avatarStyle: window.localStorage.getItem('avatar') || 'bug',
 	color: window.localStorage.getItem('color') || '#55aadd',
+	controlType: ControlType.NONE,
 	/** @var {?CanvasRenderingContext2D} */
 	display: null,
 	/** @readonly */
@@ -38,15 +54,27 @@ const store = reactive({
 	/** @readonly */
 	facing: computed(() => facing.value),
 	/** @readonly */
-	hasInput: computed(() => Object.values(store.inputs).some(value => value)),
-	inputs: {
-		w: false,
-		a: false,
-		s: false,
-		d: false,
+	input: {
+		hasAny: computed(() => store.input.hasKey || store.input.hasVirtual),
+		hasKey: computed(() => any(store.input.key, 'wasd'.split(''))),
+		hasVirtual: computed(() => any(store.input.virtual)),
+		key: {
+			w: false,
+			a: false,
+			s: false,
+			d: false,
+			shift: false,
+		},
+		virtual: {
+			stick: false,
+		},
 	},
 	isPaused: false,
 	sensitivity: 1,
+	/** @readonly */
+	slow: computed(() => (
+		store.controlType === ControlType.KEYS && store.input.key.shift
+	)),
 	/** @readonly */
 	speed: computed(() => normalize(throttle.value)),
 	/** @readonly */
@@ -90,16 +118,20 @@ const store = reactive({
 watchEffect(() => window.localStorage.setItem('color', store.color));
 watchEffect(() => window.localStorage.setItem('avatar', store.avatarStyle));
 watchEffect(() => {
-	if (store.isPaused) return;
+	if (store.isPaused
+	||  ! [ ControlType.KEYS, ControlType.NONE ].includes(store.controlType))
+		return;
 
-	const { d, a, R, L } = store.inputs;
+	const { d, a, R, L } = store.input.key;
 
 	store.throttleX = d - a; // note: coerced from booleans
 });
 watchEffect(() => {
-	if (store.isPaused) return;
+	if (store.isPaused
+	||  ! [ ControlType.KEYS, ControlType.NONE ].includes(store.controlType))
+		return;
 
-	const { w, s, U, D } = store.inputs;
+	const { w, s, U, D } = store.input.key;
 
 	store.throttleY = s - w; // note: coerced from booleans
 });
@@ -109,6 +141,16 @@ watchEffect(() => {
 
 	// see https://stackoverflow.com/questions/15994194/how-to-convert-x-y-coordinates-to-an-angle
 	facing.value = Math.atan2(store.throttleX, -store.throttleY); // -Y because canvas Y-axis increases downward as opposed to upward
+});
+watchEffect(() => {
+	if (! store.input.hasAny)
+		return store.controlType = ControlType.NONE;
+
+	if (store.input.hasVirtual)
+		return store.controlType = ControlType.VIRTUAL;
+
+	if (store.input.hasKey)
+		return store.controlType = ControlType.KEYS;
 });
 
 

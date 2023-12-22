@@ -13,9 +13,19 @@ const displayPxSize = computed(() => (store.display
 	: 'none'
 ));
 
-const inputs = computed(() => JSON.stringify(
-	Object.keys(store.inputs).filter(key => store.inputs[key]), null, 1,
-).replace(/["\n]/g, '').replace(/\]/, ' ]').toUpperCase());
+const getInput = hash => Object.keys(hash).filter(key => hash[key]);
+const input = computed(
+	() => {
+		const input = [
+			...getInput(store.input.key),
+			...getInput(store.input.virtual).map(input => `VIRTUAL_${input}`),
+		]
+		return JSON.stringify(input, null, 1)
+			.replace(/["\n]/g, '')
+			.replace(/\]/, ' ]')
+			.toUpperCase();
+	},
+);
 const isDevHidden = ref(false);
 const deci = n => (
 	(n === -0)
@@ -76,8 +86,10 @@ const deci = n => (
 				<dl class="dl-cols  ms-2 mb-0">
 					<dt>avatar style:</dt>
 					<dd><output>{{ store.avatarStyle }}</output></dd>
+					<dt>control type:</dt>
+					<dd><output>{{ store.controlType }}</output></dd>
 					<dt>inputs:</dt>
-					<dd><output>{{ inputs }}</output></dd>
+					<dd><output>{{ input }}</output></dd>
 					<dt>position:</dt>
 					<dd><output>(x: {{ Math.round(store.x) }}, y: {{ Math.round(store.y) }})</output></dd>
 					<dt>speed:</dt>

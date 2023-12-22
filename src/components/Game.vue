@@ -142,9 +142,13 @@ window.$game = { clock, store, sprite, hitbox };
 watch(() => store.isPaused, () => store.isPaused && draw());
 
 
+const _onBlur = () => isWindowFocussed = false;
+const _onFocus = () => isWindowFocussed = true;
+
+
 onMounted(() => {
-	window.addEventListener('blur', () => isWindowFocussed = false);
-	window.addEventListener('focus', () => isWindowFocussed = true);
+	window.addEventListener('blur', _onBlur);
+	window.addEventListener('focus', _onFocus);
 
 	store.displayTo(document.getElementById('game-display'));
 
@@ -155,6 +159,9 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+	window.removeEventListener('blur', _onBlur);
+	window.removeEventListener('focus', _onFocus);
+
 	delete window.$game;
 
 	store.reset();

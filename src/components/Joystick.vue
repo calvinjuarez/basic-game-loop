@@ -6,8 +6,6 @@ const store = inject('store');
 
 const $handle = ref(null);
 
-const controlling = ref(false);
-
 let pointerX = 0;
 let pointerY = 0;
 
@@ -19,7 +17,7 @@ const position = computed(() => ({
 
 
 function controlStart(e) {
-	controlling.value = true;
+	store.input.virtual.stick = true;
 
 	pointerX = e.x;
 	pointerY = e.y;
@@ -27,7 +25,8 @@ function controlStart(e) {
 	$handle.value.setPointerCapture(e.pointerId);
 }
 function controlMove(e) {
-	if (! controlling.value) return;
+	if (! store.input.virtual.stick) return;
+
 
 	store.throttleX = (e.x - pointerX) / 100;
 	store.throttleY = (e.y - pointerY) / 100;
@@ -38,13 +37,13 @@ function controlMove(e) {
 		controlEnd();
 }
 function controlEnd(e) {
-	controlling.value = false;
-
-	store.throttleX = pointerX = 0;
-	store.throttleY = pointerY = 0;
-
 	if (e && $handle.value.hasPointerCapture(e.pointerId))
 		$handle.value.releasePointerCapture(e.pointerId);
+
+	store.input.virtual.stick = false;
+
+	store.throttleX = pointerX = position.x = 0;
+	store.throttleY = pointerY = position.y = 0;
 }
 </script>
 
