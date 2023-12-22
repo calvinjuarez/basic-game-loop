@@ -17,6 +17,10 @@ const facing = ref(0);
 
 // PRIVATE METHODS
 const normalize = n => n * normalFactor.value;
+const any = (hash, keys) => Array.isArray(keys)
+	? keys.some(key => Object.hasOwn(hash, key) && hash[key])
+	: Object.values(hash).some(value => value);
+
 
 
 const store = reactive({
@@ -38,12 +42,20 @@ const store = reactive({
 	/** @readonly */
 	facing: computed(() => facing.value),
 	/** @readonly */
-	hasInput: computed(() => Object.values(store.inputs).some(value => value)),
-	inputs: {
-		w: false,
-		a: false,
-		s: false,
-		d: false,
+	input: {
+		hasAny: computed(() => store.input.hasKey || store.input.hasVirtual),
+		hasKey: computed(() => any(store.input.key, 'wasd'.split(''))),
+		hasVirtual: computed(() => any(store.input.virtual)),
+		key: {
+			w: false,
+			a: false,
+			s: false,
+			d: false,
+			shift: false,
+		},
+		virtual: {
+			stick: false,
+		},
 	},
 	isPaused: false,
 	sensitivity: 1,
@@ -92,14 +104,14 @@ watchEffect(() => window.localStorage.setItem('avatar', store.avatarStyle));
 watchEffect(() => {
 	if (store.isPaused) return;
 
-	const { d, a, R, L } = store.inputs;
+	const { d, a, R, L } = store.input.key;
 
 	store.throttleX = d - a; // note: coerced from booleans
 });
 watchEffect(() => {
 	if (store.isPaused) return;
 
-	const { w, s, U, D } = store.inputs;
+	const { w, s, U, D } = store.input.key;
 
 	store.throttleY = s - w; // note: coerced from booleans
 });
