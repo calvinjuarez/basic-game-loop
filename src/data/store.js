@@ -110,14 +110,18 @@ const store = reactive({
 watchEffect(() => window.localStorage.setItem('color', store.color));
 watchEffect(() => window.localStorage.setItem('avatar', store.avatarStyle));
 watchEffect(() => {
-	if (store.isPaused) return;
+	if (store.isPaused
+	||  ! [ ControlType.KEYS, ControlType.NONE ].includes(store.controlType))
+		return;
 
 	const { d, a, R, L } = store.input.key;
 
 	store.throttleX = d - a; // note: coerced from booleans
 });
 watchEffect(() => {
-	if (store.isPaused) return;
+	if (store.isPaused
+	||  ! [ ControlType.KEYS, ControlType.NONE ].includes(store.controlType))
+		return;
 
 	const { w, s, U, D } = store.input.key;
 
