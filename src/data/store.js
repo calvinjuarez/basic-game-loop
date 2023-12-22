@@ -17,7 +17,11 @@ const throttle = computed(() => (
 	store.isPaused ? 0 : Math.sqrt(store.throttleX ** 2 + store.throttleY ** 2)
 ));
 const normalFactor = computed(() => (
-	(store.isPaused || throttle.value <= 1) ? 1 : (1 / throttle.value)
+	(
+		(store.isPaused || throttle.value <= 1) ? 1 : (1 / throttle.value)
+	) * (
+		store.slow ? .4 : 1
+	)
 ));
 const facing = ref(0);
 
@@ -67,6 +71,10 @@ const store = reactive({
 	},
 	isPaused: false,
 	sensitivity: 1,
+	/** @readonly */
+	slow: computed(() => (
+		store.controlType === ControlType.KEYS && store.input.key.shift
+	)),
 	/** @readonly */
 	speed: computed(() => normalize(throttle.value)),
 	/** @readonly */
